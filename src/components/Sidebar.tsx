@@ -1,71 +1,45 @@
-import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import './Sidebar.css'
+import { Link, useLocation } from 'react-router-dom';
+import { Home, Vote, BarChart3, Info, Shield } from 'lucide-react';
 
-interface NavItem {
-  path: string
-  label: string
-  icon: string
-}
+export default function Sidebar() {
+  const location = useLocation();
 
-const Sidebar: React.FC = () => {
-  const location = useLocation()
-
-  const mainNavItems: NavItem[] = [
-    { path: '/', label: 'Inicio', icon: '🏠' },
-    { path: '/votar', label: 'Votar', icon: '📄' },
-    { path: '/procesos', label: 'Procesos', icon: '📊' }
-  ]
-
-  const otherNavItems: NavItem[] = [
-    { path: '/acerca', label: 'Acerca de', icon: 'ℹ️' },
-    { path: '/admin/login', label: 'Admin', icon: '👤' }
-  ]
-
-  const isActive = (path: string): boolean => {
-    if (path === '/') {
-      return location.pathname === '/'
-    }
-    return location.pathname.startsWith(path)
-  }
+  const links = [
+    { to: '/', label: 'Inicio', icon: Home },
+    { to: '/votar', label: 'Votar', icon: Vote },
+    { to: '/resultados', label: 'Resultados', icon: BarChart3 },
+    { to: '/acerca-de', label: 'Acerca de', icon: Info },
+    { to: '/admin/login', label: 'Admin', icon: Shield },
+  ];
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-content">
-        <h2 className="sidebar-title">Navegación</h2>
-        
-        <nav className="sidebar-nav">
-          {mainNavItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
-            >
-              <span className="nav-icon">{item.icon}</span>
-              <span className="nav-label">{item.label}</span>
-            </Link>
-          ))}
-        </nav>
-
-        <div className="sidebar-divider"></div>
-
-        <nav className="sidebar-nav">
-          <h3 className="sidebar-section-title">Otros</h3>
-          {otherNavItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
-            >
-              <span className="nav-icon">{item.icon}</span>
-              <span className="nav-label">{item.label}</span>
-            </Link>
-          ))}
-        </nav>
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-dark-card border-r border-gray-700">
+      <div className="p-6">
+        <h1 className="text-2xl font-bold text-blue-400">Sistema Electoral</h1>
+        <p className="text-sm text-gray-400 mt-1">Nacional</p>
       </div>
+
+      <nav className="mt-6">
+        {links.map((link) => {
+          const Icon = link.icon;
+          const isActive = location.pathname === link.to;
+          
+          return (
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`flex items-center gap-3 px-6 py-3 transition-colors ${
+                isActive
+                  ? 'bg-blue-600 text-white border-r-4 border-blue-400'
+                  : 'text-gray-300 hover:bg-dark-hover'
+              }`}
+            >
+              <Icon size={20} />
+              <span>{link.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </aside>
-  )
+  );
 }
-
-export default Sidebar
-
