@@ -87,7 +87,7 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
               <Button 
                 size="lg" 
-                onClick={() => navigate("/vote")}
+                onClick={() => navigate("/votar")}
                 className="bg-white text-blue-900 hover:bg-blue-50 px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105"
               >
                 <Vote className="mr-3 h-6 w-6" />
@@ -95,7 +95,7 @@ export default function HomePage() {
               </Button>
               <Button 
                 size="lg" 
-                onClick={() => navigate("/results")}
+                onClick={() => navigate("/resultados")}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105"
               >
                 <BarChart3 className="mr-3 h-6 w-6" />
@@ -209,7 +209,7 @@ export default function HomePage() {
             </p>
             <Button 
               size="lg"
-              onClick={() => navigate("/vote")}
+              onClick={() => navigate("/votar")}
               className="bg-white text-blue-900 hover:bg-blue-50 px-12 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105"
             >
               <Vote className="mr-3 h-6 w-6" />
