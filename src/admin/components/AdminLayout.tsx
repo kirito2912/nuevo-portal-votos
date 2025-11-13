@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 import AdminHeader from './AdminHeader';
-import '../../styles/admin/index.css';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -8,9 +7,9 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
-    <div className="admin-layout">
+    <div className="min-h-screen bg-dark-bg text-white">
       <AdminHeader />
-      <main className="admin-main-content">
+      <main className="p-8">
         {children}
       </main>
     </div>
