@@ -1,0 +1,84 @@
+/* Estilos para la sección de Resultados */
+
+.results-section {
+  margin-top: var(--admin-spacing-lg);
+}
+
+.results-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--admin-text-primary);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.results-section-subtitle {
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: var(--admin-spacing-md);
+}
+
+.results-process-info {
+  background-color: var(--admin-bg-card);
+  border: 1px solid var(--admin-border-color);
+  border-radius: var(--admin-border-radius);
+  padding: var(--admin-spacing-md);
+  margin-top: var(--admin-spacing-md);
+}
+
+.results-process-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--admin-text-primary);
+  margin-bottom: var(--admin-spacing-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.results-process-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.results-process-item {
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.results-process-item::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--admin-text-secondary);
+}
+
+.results-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--admin-border-radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-top: var(--admin-spacing-sm);
+}
+
+.results-status-ok {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--admin-status-success);
+  border: 1px solid var(--admin-status-success);
+}
+
+.results-status-warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--admin-status-warning);
+  border: 1px solid var(--admin-status-warning);
+}
+

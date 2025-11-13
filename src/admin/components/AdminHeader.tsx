@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Shield } from 'lucide-react';
+import { CheckSquare2, CheckCircle2, ArrowRight } from 'lucide-react';
+import '../../styles/admin/index.css';
 
 export default function AdminHeader() {
   const navigate = useNavigate();
@@ -9,20 +10,35 @@ export default function AdminHeader() {
   };
 
   return (
-    <header className="bg-dark-card border-b border-gray-700 px-8 py-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Shield className="text-blue-400" size={28} />
-          <h1 className="text-2xl font-bold">Panel de Administración</h1>
+    <header className="admin-header">
+      <div className="admin-header-content">
+        <div className="admin-header-left">
+          <CheckSquare2 className="text-blue-400" size={28} />
+          <div>
+            <h1 className="admin-header-title">Panel de Administración</h1>
+            <p className="admin-header-subtitle">Sistema Electoral Digital</p>
+          </div>
         </div>
 
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
-        >
-          <LogOut size={18} />
-          <span>Cerrar Sesión</span>
-        </button>
+        <div className="admin-header-right">
+          <div className="admin-user-info">
+            <span className="admin-user-email">admin@electoral.gov</span>
+            <span className="admin-user-role">Administrador</span>
+          </div>
+          
+          <button
+            onClick={handleLogout}
+            className="admin-logout-btn"
+          >
+            <span>Cerrar Sesión</span>
+            <ArrowRight size={18} />
+          </button>
+
+          <div className="admin-status-badge">
+            <CheckCircle2 size={16} />
+            <span>Estado del Sistema Operativo</span>
+          </div>
+        </div>
       </div>
     </header>
   );
