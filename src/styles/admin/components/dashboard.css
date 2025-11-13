@@ -1,0 +1,135 @@
+/* Estilos para el dashboard principal */
+
+.dashboard-main-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: var(--admin-spacing-xl) 0 var(--admin-spacing-md) 0;
+}
+
+.dashboard-main-title h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--admin-text-primary);
+  text-align: center;
+  margin: 0;
+}
+
+.dashboard-subtitle {
+  text-align: center;
+  color: var(--admin-text-secondary);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: var(--admin-spacing-xl);
+}
+
+.dashboard-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--admin-spacing-md);
+  margin-bottom: var(--admin-spacing-xl);
+}
+
+.dashboard-metric-card {
+  background-color: var(--admin-bg-card);
+  border: 1px solid var(--admin-border-color);
+  border-radius: var(--admin-border-radius);
+  padding: var(--admin-spacing-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-metric-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--admin-border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--admin-spacing-sm);
+  flex-shrink: 0;
+}
+
+.dashboard-metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--admin-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-metric-label {
+  font-size: 0.875rem;
+  color: var(--admin-text-secondary);
+}
+
+.dashboard-metric-badge {
+  position: absolute;
+  top: var(--admin-spacing-sm);
+  right: var(--admin-spacing-sm);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid currentColor;
+}
+
+.dashboard-nav-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: var(--admin-spacing-xl);
+  border-bottom: 1px solid var(--admin-border-color);
+}
+
+.dashboard-nav-item {
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  color: var(--admin-text-secondary);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dashboard-nav-item:hover {
+  color: var(--admin-text-primary);
+}
+
+.dashboard-nav-item.active {
+  color: var(--admin-accent-gold);
+  border-bottom-color: var(--admin-accent-gold);
+  background-color: rgba(212, 175, 55, 0.1);
+}
+
+.results-section {
+  margin-top: var(--admin-spacing-lg);
+}
+
+.results-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--admin-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.results-section-subtitle {
+  color: var(--admin-text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: var(--admin-spacing-md);
+}
+
+.results-placeholder {
+  border: 2px dashed var(--admin-border-color);
+  border-radius: var(--admin-border-radius);
+  padding: var(--admin-spacing-xl);
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--admin-bg-card);
+}
+
