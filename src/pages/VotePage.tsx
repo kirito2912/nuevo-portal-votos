@@ -41,7 +41,7 @@ function CandidateDetailsModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-100 rounded-2xl max-w-2xl w-full mx-auto shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-gray-100 rounded-xl sm:rounded-2xl max-w-2xl w-full mx-auto shadow-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="bg-white p-6 relative">
           <button
@@ -638,28 +638,28 @@ export default function VotePage() {
   // Si está autenticado, muestra la página de votación con los candidatos
   if (isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4 sm:p-6 md:p-8">
         <div className="max-w-6xl mx-auto">
           {/* Mensaje de verificación exitosa */}
-          <div className="text-center mb-12">
-            <div className="inline-block bg-green-500/20 border border-green-500/30 rounded-2xl px-8 py-4 mb-8">
-              <h2 className="text-2xl font-bold text-green-400">Identidad verificada exitosamente</h2>
-              <p className="text-green-300 mt-2">Ahora puede proceder a votar</p>
+          <div className="text-center mb-8 sm:mb-12">
+            <div className="inline-block bg-green-500/20 border border-green-500/30 rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-4 mb-6 sm:mb-8">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-green-400">Identidad verificada exitosamente</h2>
+              <p className="text-green-300 mt-2 text-sm sm:text-base">Ahora puede proceder a votar</p>
             </div>
             
             {/* Título y descripción */}
-            <h1 className="text-4xl font-bold text-white mb-4">Candidatos</h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">Candidatos</h1>
+            <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto px-4">
               Conozca las propuestas y trayectoria de cada candidato para tomar una decisión informada.
             </p>
           </div>
 
           {/* Pestañas de categorías */}
-          <div className="flex justify-center mb-12">
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-2 flex space-x-2 shadow-lg">
+          <div className="flex justify-center mb-8 sm:mb-12 overflow-x-auto pb-2">
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1.5 sm:p-2 flex space-x-1 sm:space-x-2 shadow-lg">
               <button
                 onClick={() => setActiveCategory('presidencial')}
-                className={`px-12 py-3 rounded-xl font-semibold transition-all ${
+                className={`px-4 sm:px-6 md:px-12 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all whitespace-nowrap ${
                   activeCategory === 'presidencial'
                     ? 'bg-blue-600 text-white shadow-lg'
                     : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
@@ -669,7 +669,7 @@ export default function VotePage() {
               </button>
               <button
                 onClick={() => setActiveCategory('regional')}
-                className={`px-12 py-3 rounded-xl font-semibold transition-all ${
+                className={`px-4 sm:px-6 md:px-12 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all whitespace-nowrap ${
                   activeCategory === 'regional'
                     ? 'bg-blue-600 text-white shadow-lg'
                     : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
@@ -679,7 +679,7 @@ export default function VotePage() {
               </button>
               <button
                 onClick={() => setActiveCategory('distrital')}
-                className={`px-12 py-3 rounded-xl font-semibold transition-all ${
+                className={`px-4 sm:px-6 md:px-12 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all whitespace-nowrap ${
                   activeCategory === 'distrital'
                     ? 'bg-blue-600 text-white shadow-lg'
                     : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
@@ -691,7 +691,7 @@ export default function VotePage() {
           </div>
 
           {/* Grid de candidatos - 2 columnas */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {getCandidatesByCategory().map((candidate) => (
               <CandidateCard
                 key={candidate.id}
@@ -797,12 +797,12 @@ export default function VotePage() {
         {/* Lado Derecho - Formulario */}
         <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-2xl">
           <CardHeader className="text-center space-y-6 pb-8">
-            <div className="mx-auto w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <Lock className="h-10 w-10 text-white" />
+            <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+              <Lock className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
             </div>
             <div>
-              <CardTitle className="text-3xl text-white mb-4">Verificación de Identidad</CardTitle>
-              <CardDescription className="text-blue-200 text-lg">
+              <CardTitle className="text-2xl sm:text-3xl text-white mb-3 sm:mb-4">Verificación de Identidad</CardTitle>
+              <CardDescription className="text-blue-200 text-base sm:text-lg">
                 Ingrese sus datos oficiales para acceder al sistema
               </CardDescription>
             </div>
@@ -818,8 +818,8 @@ export default function VotePage() {
               </div>
             )}
 
-            <form onSubmit={handleAccessSubmit} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleAccessSubmit} className="space-y-6 sm:space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {/* DNI */}
                 <div className="space-y-4">
                   <Label htmlFor="dni" className="text-white font-semibold text-base">

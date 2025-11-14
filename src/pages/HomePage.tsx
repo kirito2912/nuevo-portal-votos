@@ -63,42 +63,42 @@ export default function HomePage() {
       {/* Header Hero */}
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-900/90 via-purple-900/90 to-blue-900/90 border-b border-blue-700/50">
         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
-        <div className="relative container mx-auto px-4 py-20">
+        <div className="relative container mx-auto px-4 py-12 sm:py-16 md:py-20">
           <div className="text-center max-w-4xl mx-auto space-y-8">
-            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
-              <Calendar className="h-5 w-5 text-white" />
+            <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 text-sm sm:text-base">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               <span className="text-white font-semibold">Proceso Electoral 2025 - En Curso</span>
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
               Sistema Electoral
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200 mt-2">
                 Nacional
               </span>
             </h1>
             
-            <p className="text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed px-4">
               Plataforma oficial de votación digital del Estado. 
               <strong className="text-white"> Seguro</strong>. 
               <strong className="text-white"> Transparente</strong>. 
               <strong className="text-white"> Verificable</strong>.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6 sm:pt-8 px-4">
               <Button 
                 size="lg" 
                 onClick={() => navigate("/votar")}
-                className="bg-white text-blue-900 hover:bg-blue-50 px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105"
+                className="bg-white text-blue-900 hover:bg-blue-50 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 w-full sm:w-auto"
               >
-                <Vote className="mr-3 h-6 w-6" />
+                <Vote className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
                 Emitir Mi Voto
               </Button>
               <Button 
                 size="lg" 
                 onClick={() => navigate("/resultados")}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 hover:scale-105 w-full sm:w-auto"
               >
-                <BarChart3 className="mr-3 h-6 w-6" />
+                <BarChart3 className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
                 Ver Resultados en Tiempo Real
               </Button>
             </div>
@@ -107,8 +107,8 @@ export default function HomePage() {
       </div>
 
       {/* Features Section - MODIFICADO para más espacio y mejor ancho */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <section className="container mx-auto px-4 py-12 sm:py-16 md:py-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
           {features.map((feature, index) => (
             <Card key={index} className="bg-gray-800/60 backdrop-blur-sm border-gray-700 hover:bg-gray-800/80 transition-all duration-300 group hover:scale-105 h-full">
               <CardContent className="p-8 text-center h-full flex flex-col">
@@ -126,18 +126,18 @@ export default function HomePage() {
       </section>
 
       {/* Elections Section */}
-      <section className="container mx-auto px-4 py-20 bg-gray-800/30 backdrop-blur-sm border-t border-b border-gray-700/50">
+      <section className="container mx-auto px-4 py-12 sm:py-16 md:py-20 bg-gray-800/30 backdrop-blur-sm border-t border-b border-gray-700/50">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
               Procesos Electorales
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto px-4">
               Participa en las elecciones nacionales y regionales
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {elections.map((election, index) => (
               <Card key={index} className={`border-2 ${
                 election.status === 'active' 
@@ -197,22 +197,22 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="container mx-auto px-4 py-20">
+      <section className="container mx-auto px-4 py-12 sm:py-16 md:py-20">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 shadow-2xl">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 shadow-2xl">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6">
               ¡Tu Voto Es Tu Voz!
             </h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-blue-100 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-4">
               Participa en la construcción democrática de nuestro país. 
               Cada voto cuenta en la toma de decisiones nacional.
             </p>
             <Button 
               size="lg"
               onClick={() => navigate("/votar")}
-              className="bg-white text-blue-900 hover:bg-blue-50 px-12 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105"
+              className="bg-white text-blue-900 hover:bg-blue-50 px-8 sm:px-12 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-2xl hover:shadow-white/25 transition-all duration-300 hover:scale-105"
             >
-              <Vote className="mr-3 h-6 w-6" />
+              <Vote className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
               Ir a la Cabina de Votación
             </Button>
           </div>

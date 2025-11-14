@@ -4,16 +4,49 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  margin: var(--admin-spacing-xl) 0 var(--admin-spacing-md) 0;
+  gap: 0.5rem;
+  margin: 1.5rem 0 1rem 0;
+  flex-wrap: wrap;
 }
 
 .dashboard-main-title h1 {
-  font-size: 2.5rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--admin-text-primary);
   text-align: center;
   margin: 0;
+}
+
+.dashboard-main-title svg {
+  width: 24px;
+  height: 24px;
+}
+
+@media (min-width: 640px) {
+  .dashboard-main-title {
+    gap: 1rem;
+    margin: var(--admin-spacing-xl) 0 var(--admin-spacing-md) 0;
+  }
+  
+  .dashboard-main-title h1 {
+    font-size: 2rem;
+  }
+  
+  .dashboard-main-title svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-main-title h1 {
+    font-size: 2.5rem;
+  }
+  
+  .dashboard-main-title svg {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 .dashboard-subtitle {
@@ -26,9 +59,23 @@
 
 .dashboard-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--admin-spacing-md);
-  margin-bottom: var(--admin-spacing-xl);
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .dashboard-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--admin-spacing-md);
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-metrics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    margin-bottom: var(--admin-spacing-xl);
+  }
 }
 
 .dashboard-metric-card {
@@ -76,13 +123,15 @@
 
 .dashboard-nav-bar {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: var(--admin-spacing-xl);
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
   border-bottom: 1px solid var(--admin-border-color);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .dashboard-nav-item {
-  padding: 0.75rem 1.5rem;
+  padding: 0.5rem 0.75rem;
   font-weight: 500;
   color: var(--admin-text-secondary);
   background: transparent;
@@ -92,7 +141,33 @@
   transition: all 0.2s;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dashboard-nav-item svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (min-width: 640px) {
+  .dashboard-nav-bar {
+    gap: 0.5rem;
+    margin-bottom: var(--admin-spacing-xl);
+  }
+  
+  .dashboard-nav-item {
+    padding: 0.75rem 1.5rem;
+    gap: 0.5rem;
+    font-size: 1rem;
+  }
+  
+  .dashboard-nav-item svg {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 .dashboard-nav-item:hover {
