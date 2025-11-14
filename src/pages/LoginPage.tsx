@@ -21,7 +21,7 @@ export default function LoginPage() {
       setIsLoading(false);
     }, 1500);
   };
-  
+
   const handleGoBack = () => {
     navigate('/');
   };
