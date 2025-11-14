@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, Lock, User, Calendar, MapPin, AlertCircle, X, Mail, Eye, EyeOff, BookOpen, Target, Award, ArrowLeft } from "lucide-react";
+import { Shield, Lock, User, Calendar, MapPin, AlertCircle, X, BookOpen, Target, Award, ArrowLeft } from "lucide-react";
 
 // Componente Modal de Detalles del Candidato
 function CandidateDetailsModal({
@@ -318,7 +317,6 @@ function CandidateCard({ id: _id, name, party, description, proposals, photo, ed
 }
 
 export default function VotePage() {
-  const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeCategory, setActiveCategory] = useState<'presidencial' | 'regional' | 'distrital'>('presidencial');
   const [voterDni, setVoterDni] = useState("");
@@ -327,7 +325,6 @@ export default function VotePage() {
   const [voterFechaNacimiento, setVoterFechaNacimiento] = useState("");
   const [voterRegion, setVoterRegion] = useState("");
   const [voterDistrito, setVoterDistrito] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [isMinor, setIsMinor] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
