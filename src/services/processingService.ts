@@ -7,7 +7,8 @@
  * 3. Implementar los endpoints en el backend (FastAPI + Pandas)
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+// Variable preparada para cuando se implemente el backend
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 export interface QualityAnalysis {
   totalRecords: number;
@@ -190,10 +191,10 @@ export const getProcessingStatus = async (): Promise<ProcessingStatus> => {
 /**
  * Obtiene los datos procesados (para mostrar en tabla)
  */
-export const getProcessedData = async (limit: number = 100): Promise<any[]> => {
+export const getProcessedData = async (_limit: number = 100): Promise<any[]> => {
   try {
     // TODO: Descomentar cuando el backend esté listo
-    // const response = await fetch(`${API_BASE_URL}/processing/data?limit=${limit}`);
+    // const response = await fetch(`${API_BASE_URL}/processing/data?limit=${_limit}`);
     // if (!response.ok) throw new Error('Error al obtener datos');
     // return await response.json();
     
