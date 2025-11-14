@@ -15,23 +15,32 @@ export default function ResultsTab({ selectedCategory, onCategoryChange }: Resul
   const [nullCount, setNullCount] = useState(0);
   const [processedVotes, setProcessedVotes] = useState(1247);
 
-  // Datos de candidatos presidenciales
+  // Datos de candidatos presidenciales (10 candidatos)
   const presidentialData = [
-    { candidate: 'Keiko Fujimori', party: 'Fuerza Popular', votes: 456, percentage: 36.6 },
-    { candidate: 'Rafael López Aliaga', party: 'Renovación Popular', votes: 399, percentage: 32.0 },
-    { candidate: 'César Acuña', party: 'Alianza Para el Progreso', votes: 392, percentage: 31.4 },
+    { candidate: 'Keiko Fujimori', party: 'Fuerza Popular', votes: 1250, percentage: 18.5 },
+    { candidate: 'Rafael López Aliaga', party: 'Renovación Popular', votes: 1120, percentage: 16.6 },
+    { candidate: 'Verónika Mendoza', party: 'Nuevo Perú', votes: 980, percentage: 14.5 },
+    { candidate: 'Hernando de Soto', party: 'Avanza País', votes: 920, percentage: 13.6 },
+    { candidate: 'Cesar Acuña', party: 'Alianza para el Progreso', votes: 890, percentage: 13.2 },
+    { candidate: 'López Chau', party: 'Ahora Nación', votes: 750, percentage: 11.1 },
+    { candidate: 'Carlos Espá', party: 'SíCreo', votes: 680, percentage: 10.1 },
+    { candidate: 'Carlos Álvarez', party: 'País para Todos', votes: 620, percentage: 9.2 },
+    { candidate: 'Phillip Butters', party: 'Voz del Pueblo', votes: 340, percentage: 5.0 },
+    { candidate: 'Wolfgang Grozo', party: 'Soberanía Digital', votes: 200, percentage: 3.0 },
   ];
 
-  // Datos de candidatos regionales
+  // Datos de candidatos regionales (3 candidatos)
   const regionalData = [
-    { candidate: 'Ana María Torres', party: 'Fuerza Regional', votes: 512, percentage: 52.4 },
-    { candidate: 'Miguel Ángel Castro', party: 'Alianza Regional', votes: 465, percentage: 47.6 },
+    { candidate: 'Ana María Torres', party: 'Fuerza Regional', votes: 512, percentage: 40.0 },
+    { candidate: 'Miguel Ángel Castro', party: 'Alianza Regional', votes: 465, percentage: 36.3 },
+    { candidate: 'Laura Mendoza', party: 'Unión Regional', votes: 303, percentage: 23.7 },
   ];
 
-  // Datos de candidatos distritales
+  // Datos de candidatos distritales (3 candidatos)
   const distritalData = [
-    { candidate: 'Carlos Rojas', party: 'Fuerza Distrital', votes: 226, percentage: 50.9 },
-    { candidate: 'Patricia Silva', party: 'Alianza Distrital', votes: 218, percentage: 49.1 },
+    { candidate: 'Carlos Rojas', party: 'Fuerza Distrital', votes: 226, percentage: 38.3 },
+    { candidate: 'Patricia Silva', party: 'Alianza Distrital', votes: 218, percentage: 36.9 },
+    { candidate: 'Javier Quispe', party: 'Unión Distrital', votes: 146, percentage: 24.8 },
   ];
 
   // Obtener datos según la categoría seleccionada

@@ -38,7 +38,12 @@ export default function ProcessingTab() {
     { id: 'normalizar', label: 'Normalizar', icon: Layers },
   ];
 
-  const candidates = ['Keiko Fujimori', 'Rafael López Aliaga', 'César Acuña', 'Ana María Torres', 'Miguel Ángel Castro'];
+  const candidates = [
+    'Keiko Fujimori', 'Rafael López Aliaga', 'Verónika Mendoza', 'Hernando de Soto', 
+    'Cesar Acuña', 'López Chau', 'Carlos Espá', 'Carlos Álvarez', 
+    'Phillip Butters', 'Wolfgang Grozo', 'Ana María Torres', 'Miguel Ángel Castro', 
+    'Laura Mendoza', 'Carlos Rojas', 'Patricia Silva', 'Javier Quispe'
+  ];
   const regions = ['Lima', 'Arequipa', 'Cusco', 'La Libertad', 'Piura', 'Lambayeque'];
   const distritos = ['Lima', 'Miraflores', 'San Isidro', 'Surco', 'La Molina', 'Barranco'];
 

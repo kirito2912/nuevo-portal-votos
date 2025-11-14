@@ -41,8 +41,20 @@ function CandidateDetailsModal({
           
           <div className="flex items-start gap-4">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
-                {candidate.name.charAt(0)}
+              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-blue-600">
+                <img 
+                  src={candidate.photo} 
+                  alt={`Foto de ${candidate.name}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">${candidate.name.charAt(0)}</div>`;
+                    }
+                  }}
+                />
               </div>
               <div className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-800 flex items-center justify-center">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -116,6 +128,7 @@ function ConfirmVoteModal({
   onConfirm, 
   candidateName, 
   candidateParty,
+  candidatePhoto,
   voterData 
 }: {
   isOpen: boolean;
@@ -123,6 +136,7 @@ function ConfirmVoteModal({
   onConfirm: () => void;
   candidateName: string;
   candidateParty: string;
+  candidatePhoto: string;
   voterData: {
     dni: string;
     name: string;
@@ -172,8 +186,20 @@ function ConfirmVoteModal({
           {/* Candidato seleccionado */}
           <div className="border-t border-gray-600 pt-4">
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
-                {candidateName.charAt(0)}
+              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-600 flex-shrink-0">
+                <img 
+                  src={candidatePhoto} 
+                  alt={`Foto de ${candidateName}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">${candidateName.charAt(0)}</div>`;
+                    }
+                  }}
+                />
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-xl text-white">{candidateName}</h3>
@@ -242,8 +268,20 @@ function CandidateCard({ id: _id, name, party, description, proposals, photo, ed
           {/* Header del candidato */}
           <div className="flex items-start gap-4 mb-4">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
-                {name.charAt(0)}
+              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-600">
+                <img 
+                  src={photo} 
+                  alt={`Foto de ${name}`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">${name.charAt(0)}</div>`;
+                    }
+                  }}
+                />
               </div>
               <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-800 flex items-center justify-center">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
@@ -335,6 +373,7 @@ export default function VotePage() {
     id: number;
     name: string;
     party: string;
+    photo: string;
   } | null>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
 
@@ -347,60 +386,126 @@ export default function VotePage() {
 
   // Candidatos Presidenciales
   const presidentialCandidates = [
-    { 
-      id: 1, 
-      name: "Keiko Fujimori", 
-      party: "Fuerza Popular", 
-      photo: "", 
-      description: "Oficializó su candidatura presidencial por Fuerza Popular con enfoque en seguridad ciudadana y programas sociales.", 
-      education: "Maestría en Administración Pública - Universidad de Harvard",
-      experience: "Líder de Fuerza Popular, excongresista, candidata presidencial en elecciones anteriores",
-      proposals: [
-        "Fortalecimiento de la seguridad ciudadana",
-        "Programas sociales focalizados",
-        "Promoción de la inversión privada",
-        "Mejora del sistema de salud pública"
-      ] 
-    },
-    { 
-      id: 2, 
-      name: "Rafael López Aliaga", 
-      party: "Renovación Popular", 
-      photo: "", 
-      description: "Renunció a su cargo como alcalde de Lima para postular a la presidencia.", 
-      education: "Ingeniero Industrial - Universidad de Lima, MBA en Columbia University",
-      experience: "Alcalde de Lima, empresario, líder de Renovación Popular",
-      proposals: [
-        "Combate frontal a la corrupción",
-        "Modernización del Estado",
-        "Reducción de la burocracia",
-        "Inversión en infraestructura"
-      ] 
-    },
-    { 
-      id: 3, 
-      name: "César Acuña", 
-      party: "Alianza Para el Progreso", 
-      photo: "", 
-      description: "Exgobernador regional, fundó Alianza Para el Progreso.", 
-      education: "Doctor en Educación - Universidad Complutense de Madrid",
-      experience: "Exgobernador de La Libertad, fundador de Alianza Para el Progreso, empresario educativo",
-      proposals: [
-        "Masificación de la educación técnica",
-        "Impulso a la infraestructura educativa",
-        "Desarrollo regional descentralizado",
-        "Fomento a la inversión privada"
-      ] 
-    }
-  ];
+  {
+    id: 1,
+    name: "Keiko Fujimori",
+    party: "Fuerza Popular",
+    photo: "/assets/candidates/keiko.PNG",
+    description: "Figura estable en encuestas, con énfasis en orden y reactivación económica.",
+    education: "Administración – Boston University",
+    experience: "Excongresista y lideresa de Fuerza Popular",
+    proposals: ["Seguridad ciudadana", "Reactivación económica", "Reforma judicial", "Programas sociales"]
+  },
+  {
+    id: 2,
+    name: "Rafael López Aliaga",
+    party: "Renovación Popular",
+    photo: "/assets/candidates/porky.PNG",
+    description: "Líder conservador con fuerte presencia nacional.",
+    education: "Ingeniería Industrial – Universidad de Lima",
+    experience: "Exalcalde de Lima",
+    proposals: ["Orden y seguridad", "Inversión privada", "Reforma policial", "Infraestructura moderna"]
+  },
+    {
+    id: 3,
+    name: "Verónika Mendoza",
+    party: "Nuevo Perú",
+    photo: "/assets/candidates/mendoza.JPG",
+    description: "Lideresa progresista con propuestas de reforma social.",
+    education: "Psicología – Universidad de París",
+    experience: "Excongresista",
+    proposals: [
+      "Transición energética",
+      "Reforma laboral",
+      "Estado social fuerte",
+      "Impulso a PYMES"
+    ]
+  },
+  {
+    id: 4,
+    name: "Hernando de Soto",
+    party: "Avanza País",
+    photo: "/assets/candidates/desoto.JPG",
+    description: "Economista global de línea liberal.",
+    education: "Economía – Suiza",
+    experience: "Presidente del ILD",
+    proposals: ["Formalización total", "Libre mercado", "Gobierno digital", "Simplificación burocrática"]
+  },
+  {
+    id: 5,
+    name: "Cesar Acuña",
+    party: "Alianza para el Progreso",
+    photo: "/assets/candidates/acuña.PNG",
+    description: "Enfoque en educación y descentralización.",
+    education: "Doctor en Educación - Universidad Complutense",
+    experience: "Exgobernador y fundador de APP",
+    proposals: [
+      "Educación técnica",
+      "Infraestructura educativa",
+      "Desarrollo regional",
+      "Impulso económico"
+    ]
+  },
+  {
+    id: 6,
+    name: "López Chau",
+    party: "Ahora Nación",
+    photo: "/assets/candidates/lopezchau.JPG",
+    description: "Figura académica con proyección nacional.",
+    education: "Economía – UNMSM",
+    experience: "Analista político",
+    proposals: ["Soberanía económica", "Educación pública", "Transporte moderno", "Empleo nacional"]
+  },
+  {
+    id: 7,
+    name: "Carlos Espá",
+    party: "SíCreo",
+    photo: "/assets/candidates/espa.JPG",
+    description: "Figura digital con discurso liberal.",
+    education: "Economía – UPN",
+    experience: "Creador de contenido político",
+    proposals: ["Menos Estado", "Transparencia blockchain", "Libre mercado", "Gobierno digital"]
+  },
+  {
+    id: 8,
+    name: "Carlos Álvarez",
+    party: "País para Todos",
+    photo: "/assets/candidates/alvarez.PNG",
+    description: "Figura mediática con discurso anticorrupción.",
+    education: "Comunicaciones – IPM",
+    experience: "Actor y activista",
+    proposals: ["Lucha anticorrupción", "Educación cívica", "Salud accesible", "Reforma policial"]
+  },
+  {
+    id: 9,
+    name: "Phillip Butters",
+    party: "Voz del Pueblo",
+    photo: "/assets/candidates/phillip.PNG",
+    description: "Comunicador conservador con base sólida.",
+    education: "Periodismo – USMP",
+    experience: "Conductor radial",
+    proposals: ["Seguridad total", "Migración controlada", "Justicia estricta", "Reforma del Estado"]
+  },
+  {
+    id: 10,
+    name: "Wolfgang Grozo",
+    party: "Soberanía Digital",
+    photo: "/assets/candidates/grozo.JPG",
+    description: "Creador político digital con fuerte llegada juvenil.",
+    education: "Negocios – UPC",
+    experience: "Analista digital",
+    proposals: ["Ciberseguridad", "Digitalización total", "Eficiencia estatal", "Transparencia nacional"]
+  }
+];
+
 
   // Candidatos Regionales
   const regionalCandidates = [
     { 
-      id: 4, 
+      id: 11, 
       name: "Ana María Torres", 
       party: "Fuerza Regional", 
-      photo: "", 
+      photo: "/assets/candidates/ana-maria-torres.jpg", 
       description: "Candidata con experiencia en gestión regional.", 
       education: "Licenciada en Administración - Universidad Nacional Mayor de San Marcos",
       experience: "Regidora regional, gestora de proyectos de desarrollo local",
@@ -412,10 +517,10 @@ export default function VotePage() {
       ] 
     },
     { 
-      id: 5, 
+      id: 12, 
       name: "Miguel Ángel Castro", 
       party: "Alianza Regional", 
-      photo: "", 
+      photo: "/assets/candidates/miguel-angel-castro.JPG", 
       description: "Comprometido con el desarrollo de la región.", 
       education: "Ingeniero Agrónomo - Universidad Nacional Agraria La Molina",
       experience: "Consultor en desarrollo rural, líder comunitario regional",
@@ -425,16 +530,31 @@ export default function VotePage() {
         "Desarrollo agrícola",
         "Mejora de carreteras"
       ] 
+    },
+    { 
+      id: 13, 
+      name: "Laura Mendoza", 
+      party: "Unión Regional", 
+      photo: "/assets/candidates/laura_mendoza.JPG", 
+      description: "Enfoque en desarrollo social y educativo.", 
+      education: "Trabajadora Social - Pontificia Universidad Católica del Perú",
+      experience: "Directora de programas sociales, activista comunitaria",
+      proposals: [
+        "Programas sociales",
+        "Educación de calidad",
+        "Salud comunitaria",
+        "Desarrollo cultural"
+      ] 
     }
   ];
 
   // Candidatos Distritales
   const distritalCandidates = [
     { 
-      id: 6, 
+      id: 14, 
       name: "Carlos Rojas", 
       party: "Fuerza Distrital", 
-      photo: "", 
+      photo: "/assets/candidates/carlos-rojas.JPG", 
       description: "Trabajando por el desarrollo del distrito.", 
       education: "Abogado - Universidad de San Martín de Porres",
       experience: "Regidor distrital, abogado especializado en gestión municipal",
@@ -446,10 +566,10 @@ export default function VotePage() {
       ] 
     },
     { 
-      id: 7, 
+      id: 15, 
       name: "Patricia Silva", 
       party: "Alianza Distrital", 
-      photo: "", 
+      photo: "/assets/candidates/patricia-silva.JPG", 
       description: "Comprometida con las necesidades locales.", 
       education: "Arquitecta - Universidad Ricardo Palma",
       experience: "Urbanista, consultora en desarrollo urbano sostenible",
@@ -458,6 +578,21 @@ export default function VotePage() {
         "Desarrollo urbano",
         "Medio ambiente",
         "Participación ciudadana"
+      ] 
+    },
+    { 
+      id: 16, 
+      name: "Javier Quispe", 
+      party: "Unión Distrital", 
+      photo: "/assets/candidates/javier-quispe.JPG", 
+      description: "Enfoque en la comunidad y participación.", 
+      education: "Contador Público - Universidad Nacional Federico Villarreal",
+      experience: "Líder vecinal, promotor de actividades deportivas y culturales",
+      proposals: [
+        "Participación ciudadana",
+        "Cultura y deporte",
+        "Juventud y educación",
+        "Desarrollo local"
       ] 
     }
   ];
@@ -563,11 +698,12 @@ export default function VotePage() {
   };
 
   // Función para manejar el clic en votar (abre el modal)
-  const handleVoteClick = (candidateId: number, candidateName: string, candidateParty: string) => {
+  const handleVoteClick = (candidateId: number, candidateName: string, candidateParty: string, candidatePhoto: string) => {
     setSelectedCandidate({
       id: candidateId,
       name: candidateName,
-      party: candidateParty
+      party: candidateParty,
+      photo: candidatePhoto
     });
     setShowConfirmModal(true);
   };
@@ -703,7 +839,7 @@ export default function VotePage() {
                 photo={candidate.photo}
                 education={candidate.education}
                 experience={candidate.experience}
-                onVote={() => handleVoteClick(candidate.id, candidate.name, candidate.party)}
+                onVote={() => handleVoteClick(candidate.id, candidate.name, candidate.party, candidate.photo)}
               />
             ))}
           </div>
@@ -732,6 +868,7 @@ export default function VotePage() {
           onConfirm={handleConfirmVote}
           candidateName={selectedCandidate?.name || ""}
           candidateParty={selectedCandidate?.party || ""}
+          candidatePhoto={selectedCandidate?.photo || ""}
           voterData={{
             dni: voterDni,
             name: `${voterName} ${voterApellidos}`,
