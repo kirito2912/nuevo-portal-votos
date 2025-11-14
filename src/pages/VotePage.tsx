@@ -1,25 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, Lock, User, Calendar, MapPin, AlertCircle, X } from "lucide-react";
+import { Shield, Lock, User, Calendar, MapPin, AlertCircle, X, Mail, Eye, EyeOff, BookOpen, Target, Award, ArrowLeft } from "lucide-react";
 
-// Interface para CandidateCard
-interface CandidateCardProps {
-  id: number;
-  name: string;
-  party: string;
-  description: string;
-  proposals: string[];
-  photo: string;
-  education: string;
-  experience: string;
-  onVote: () => void;
-}
-
-// Modal de Detalles del Candidato
+// Componente Modal de Detalles del Candidato
 function CandidateDetailsModal({
   isOpen,
   onClose,
@@ -41,74 +30,76 @@ function CandidateDetailsModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-100 rounded-xl sm:rounded-2xl max-w-2xl w-full mx-auto shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-gray-800 rounded-2xl max-w-2xl w-full mx-auto shadow-2xl max-h-[90vh] overflow-y-auto border border-gray-700">
         {/* Header */}
-        <div className="bg-white p-6 relative">
+        <div className="bg-gray-900 p-6 relative">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-300 text-gray-600 hover:bg-gray-100"
+            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-600 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
           
           <div className="flex items-start gap-4">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-3xl">
-                {candidate.photo}
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
+                {candidate.name.charAt(0)}
               </div>
-              <div className="absolute bottom-0 right-0 w-6 h-6 bg-blue-600 rounded-full border-2 border-white"></div>
+              <div className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-800 flex items-center justify-center">
+                <div className="w-2 h-2 bg-white rounded-full"></div>
+              </div>
             </div>
             
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-gray-900">{candidate.name}</h2>
-              <div className="inline-block bg-blue-600 text-white text-sm font-semibold px-3 py-1 rounded-full mt-2">
+              <h2 className="text-2xl font-bold text-white mb-2">{candidate.name}</h2>
+              <Badge className="bg-blue-600 text-white text-base px-3 py-1">
                 {candidate.party}
-              </div>
-              <p className="text-gray-600 text-sm mt-3">{candidate.description}</p>
+              </Badge>
+              <p className="text-gray-300 mt-3 leading-relaxed">{candidate.description}</p>
             </div>
           </div>
         </div>
 
         {/* Contenido */}
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-6">
           {/* Educación y Experiencia */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="bg-gray-700 rounded-xl p-4 border border-gray-600">
+              <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white text-sm">🎓</span>
+                  <BookOpen className="h-4 w-4 text-white" />
                 </div>
-                <h3 className="font-bold text-gray-900">Educación</h3>
+                <h3 className="font-bold text-white">Formación Académica</h3>
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed">{candidate.education}</p>
+              <p className="text-gray-300 text-sm leading-relaxed">{candidate.education}</p>
             </div>
 
-            <div className="bg-green-50 rounded-xl p-4 border border-green-200">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="bg-gray-700 rounded-xl p-4 border border-gray-600">
+              <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white text-sm">💼</span>
+                  <Award className="h-4 w-4 text-white" />
                 </div>
-                <h3 className="font-bold text-gray-900">Experiencia Política</h3>
+                <h3 className="font-bold text-white">Experiencia Profesional</h3>
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed">{candidate.experience}</p>
+              <p className="text-gray-300 text-sm leading-relaxed">{candidate.experience}</p>
             </div>
           </div>
 
           {/* Propuestas Principales */}
-          <div className="bg-white rounded-xl p-4 border border-gray-200">
-            <div className="flex items-center gap-2 mb-3">
+          <div className="bg-gray-700 rounded-xl p-4 border border-gray-600">
+            <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white text-sm">💡</span>
+                <Target className="h-4 w-4 text-white" />
               </div>
-              <h3 className="font-bold text-gray-900">Propuestas Principales</h3>
+              <h3 className="font-bold text-white">Propuestas Principales</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {candidate.proposals.map((proposal, index) => (
-                <div key={index} className="flex items-start gap-2 bg-gray-50 p-3 rounded-lg">
-                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold">
+                <div key={index} className="flex items-start gap-3 bg-gray-600/50 p-3 rounded-lg">
+                  <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold mt-0.5">
                     {index + 1}
                   </div>
-                  <span className="text-sm text-gray-700">{proposal}</span>
+                  <span className="text-gray-300 text-sm leading-relaxed">{proposal}</span>
                 </div>
               ))}
             </div>
@@ -143,75 +134,67 @@ function ConfirmVoteModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full mx-auto shadow-2xl">
+      <div className="bg-gray-800 rounded-2xl max-w-md w-full mx-auto shadow-2xl border border-gray-700">
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-2xl">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
           <div className="flex items-center justify-center mb-2">
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
+              <Shield className="h-7 w-7 text-white" />
             </div>
           </div>
           <h2 className="text-2xl font-bold text-center">Confirmar Voto</h2>
-          <p className="text-center text-indigo-100 mt-2">Verifique su selección antes de confirmar</p>
+          <p className="text-center text-blue-100 mt-2">Verifique su selección antes de confirmar</p>
         </div>
 
         {/* Contenido */}
         <div className="p-6 space-y-5">
           {/* Datos del Votante */}
-          <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+          <div className="bg-gray-700 rounded-xl p-4 border border-gray-600">
             <div className="flex items-center gap-2 mb-3">
-              <User className="h-5 w-5 text-blue-600" />
-              <h3 className="font-semibold text-gray-900">Datos del Votante</h3>
+              <User className="h-5 w-5 text-blue-400" />
+              <h3 className="font-semibold text-white">Datos del Votante</h3>
             </div>
             <div className="space-y-2 text-sm">
-              <div className="flex">
-                <span className="font-semibold text-blue-900 w-24">DNI:</span>
-                <span className="text-gray-700">{voterData.dni}</span>
+              <div className="flex justify-between">
+                <span className="font-semibold text-gray-300">DNI:</span>
+                <span className="text-white">{voterData.dni}</span>
               </div>
-              <div className="flex">
-                <span className="font-semibold text-blue-900 w-24">Nombre:</span>
-                <span className="text-gray-700">{voterData.name}</span>
+              <div className="flex justify-between">
+                <span className="font-semibold text-gray-300">Nombre:</span>
+                <span className="text-white">{voterData.name}</span>
               </div>
-              <div className="flex">
-                <span className="font-semibold text-blue-900 w-24">Ubicación:</span>
-                <span className="text-gray-700">{voterData.location}</span>
+              <div className="flex justify-between">
+                <span className="font-semibold text-gray-300">Ubicación:</span>
+                <span className="text-white">{voterData.location}</span>
               </div>
             </div>
           </div>
 
           {/* Candidato seleccionado */}
-          <div className="border-t border-gray-200 pt-4">
+          <div className="border-t border-gray-600 pt-4">
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl flex-shrink-0">
-                👩
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                {candidateName.charAt(0)}
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-xl text-gray-900">{candidateName}</h3>
-                <div className="inline-block bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full mt-1">
+                <h3 className="font-bold text-xl text-white">{candidateName}</h3>
+                <Badge className="bg-blue-600 text-white text-sm mt-1">
                   {candidateParty}
-                </div>
-                <p className="text-sm text-gray-600 mt-3 leading-relaxed">
-                  Oficializó su candidatura presidencial por {candidateParty}.
-                </p>
-                <p className="text-sm text-gray-700 mt-2">
-                  <span className="font-semibold">Propuesta principal:</span>
-                </p>
-                <p className="text-sm text-gray-600">
-                  Fortalecimiento de la seguridad ciudadana
+                </Badge>
+                <p className="text-gray-300 text-sm mt-3 leading-relaxed">
+                  Su voto será registrado para este candidato.
                 </p>
               </div>
             </div>
           </div>
 
           {/* Alerta de atención */}
-          <div className="bg-amber-50 border border-amber-300 rounded-xl p-4">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
             <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+              <AlertCircle className="h-5 w-5 text-amber-400 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-bold text-amber-900">¡Atención!</p>
-                <p className="text-sm text-amber-800 mt-1 leading-relaxed">
+                <p className="text-sm font-bold text-amber-400">¡Atención!</p>
+                <p className="text-sm text-amber-300 mt-1 leading-relaxed">
                   Una vez confirmado, su voto no podrá ser modificado. Esta acción es irreversible.
                 </p>
               </div>
@@ -222,7 +205,7 @@ function ConfirmVoteModal({
           <div className="flex gap-3 pt-2">
             <Button
               onClick={onClose}
-              className="flex-1 bg-gray-700 hover:bg-gray-800 text-white h-12 rounded-xl font-semibold text-base"
+              className="flex-1 bg-gray-600 hover:bg-gray-700 text-white h-12 rounded-xl font-semibold text-base"
             >
               Cancelar
             </Button>
@@ -239,8 +222,8 @@ function ConfirmVoteModal({
   );
 }
 
-// Componente CandidateCard con diseño de cuadros
-function CandidateCard({ id: _id, name, party, description, proposals, photo, education, experience, onVote }: CandidateCardProps) {
+// Componente CandidateCard MEJORADO
+function CandidateCard({ id: _id, name, party, description, proposals, photo, education, experience, onVote }: any) {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   const candidateData = {
@@ -255,68 +238,76 @@ function CandidateCard({ id: _id, name, party, description, proposals, photo, ed
 
   return (
     <>
-      <div className="bg-white rounded-xl border-4 border-blue-600 overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-        {/* Header con nombre, partido e imagen del candidato */}
-        <div className="p-6 bg-white">
-          <div className="flex items-start gap-4">
+      <Card className="bg-gray-800 border-gray-700 hover:border-blue-500 transition-all duration-300 hover:shadow-2xl h-full">
+        <CardContent className="p-6 flex flex-col h-full">
+          {/* Header del candidato */}
+          <div className="flex items-start gap-4 mb-4">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl flex-shrink-0">
-                {photo}
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl font-bold">
+                {name.charAt(0)}
               </div>
-              <div className="absolute bottom-0 right-0 w-5 h-5 bg-blue-600 rounded-full border-2 border-white"></div>
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-800 flex items-center justify-center">
+                <div className="w-2 h-2 bg-white rounded-full"></div>
+              </div>
             </div>
             
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-gray-900">{name}</h2>
-              <div className="inline-block bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full mt-1">
-                {party}
-              </div>
-              <p className="text-gray-600 text-sm mt-2 leading-relaxed">{description}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Propuestas principales */}
-        <div className="p-6 bg-white border-t border-gray-100">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center">
-              <span className="text-white text-xs">💡</span>
-            </div>
-            <h4 className="text-sm font-bold text-gray-900">
-              Propuestas principales
-            </h4>
-          </div>
-          <div className="space-y-2">
-            {proposals.slice(0, 2).map((proposal, index) => (
-              <div key={index} className="flex items-start gap-2">
-                <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold mt-0.5">
-                  {index + 1}
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-white">{name}</h3>
+                  <Badge className="bg-blue-600 text-white mt-1">{party}</Badge>
                 </div>
-                <span className="text-gray-700 text-sm leading-relaxed">{proposal}</span>
               </div>
-            ))}
+              <p className="text-gray-300 text-sm mt-2 leading-relaxed">{description}</p>
+            </div>
           </div>
-        </div>
 
-        {/* Footer con botones */}
-        <div className="p-4 bg-white border-t border-gray-100 flex gap-3">
-          <button
-            onClick={() => setShowDetailsModal(true)}
-            className="flex-1 h-10 bg-gray-800 hover:bg-gray-900 text-white rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-2"
-          >
-            <span>📄</span>
-            Ver más
-          </button>
-          <button
-            onClick={onVote}
-            className="flex-1 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-2"
-          >
-            <span>🗳️</span>
-            Votar
-          </button>
-        </div>
-      </div>
+          {/* Propuestas destacadas */}
+          <div className="mb-4 flex-1">
+            <div className="flex items-center gap-2 mb-3">
+              <Target className="h-4 w-4 text-purple-400" />
+              <span className="text-sm font-semibold text-white">Propuestas Destacadas</span>
+            </div>
+            <div className="space-y-2">
+              {proposals.slice(0, 2).map((proposal: string, index: number) => (
+                <div key={index} className="flex items-start gap-2">
+                  <div className="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold mt-0.5">
+                    {index + 1}
+                  </div>
+                  <span className="text-gray-300 text-sm leading-relaxed">{proposal}</span>
+                </div>
+              ))}
+            </div>
+          </div>
 
+          {/* Educación breve */}
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen className="h-4 w-4 text-blue-400" />
+            <span className="text-gray-400 text-sm truncate">{education.split(' - ')[0]}</span>
+          </div>
+
+          {/* Botones de acción */}
+          <div className="flex gap-3 mt-auto">
+            <Button
+              onClick={() => setShowDetailsModal(true)}
+              variant="outline"
+              className="flex-1 bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              Detalles
+            </Button>
+            <Button
+              onClick={onVote}
+              className="flex-1 bg-green-600 hover:bg-green-700"
+            >
+              <Award className="h-4 w-4 mr-2" />
+              Votar
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Modal de detalles */}
       <CandidateDetailsModal
         isOpen={showDetailsModal}
         onClose={() => setShowDetailsModal(false)}
@@ -326,21 +317,20 @@ function CandidateCard({ id: _id, name, party, description, proposals, photo, ed
   );
 }
 
-// Tipo para categorías de candidatos
-type CandidateCategory = 'presidencial' | 'regional' | 'distrital';
-
 export default function VotePage() {
+  const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<'presidencial' | 'regional' | 'distrital'>('presidencial');
   const [voterDni, setVoterDni] = useState("");
   const [voterName, setVoterName] = useState("");
   const [voterApellidos, setVoterApellidos] = useState("");
   const [voterFechaNacimiento, setVoterFechaNacimiento] = useState("");
   const [voterRegion, setVoterRegion] = useState("");
   const [voterDistrito, setVoterDistrito] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isMinor, setIsMinor] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [activeCategory, setActiveCategory] = useState<CandidateCategory>('presidencial');
   
   // Estados para el modal de confirmación
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -351,14 +341,21 @@ export default function VotePage() {
   } | null>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
 
+  // Categorías para las pestañas
+  const categories = [
+    { id: 'presidencial' as const, name: 'Presidencial', icon: Award },
+    { id: 'regional' as const, name: 'Regional', icon: MapPin },
+    { id: 'distrital' as const, name: 'Distrital', icon: User }
+  ];
+
   // Candidatos Presidenciales
   const presidentialCandidates = [
     { 
       id: 1, 
       name: "Keiko Fujimori", 
       party: "Fuerza Popular", 
-      photo: "👩", 
-      description: "Oficializó su candidatura presidencial por Fuerza Popular.", 
+      photo: "", 
+      description: "Oficializó su candidatura presidencial por Fuerza Popular con enfoque en seguridad ciudadana y programas sociales.", 
       education: "Maestría en Administración Pública - Universidad de Harvard",
       experience: "Líder de Fuerza Popular, excongresista, candidata presidencial en elecciones anteriores",
       proposals: [
@@ -372,7 +369,7 @@ export default function VotePage() {
       id: 2, 
       name: "Rafael López Aliaga", 
       party: "Renovación Popular", 
-      photo: "👨", 
+      photo: "", 
       description: "Renunció a su cargo como alcalde de Lima para postular a la presidencia.", 
       education: "Ingeniero Industrial - Universidad de Lima, MBA en Columbia University",
       experience: "Alcalde de Lima, empresario, líder de Renovación Popular",
@@ -387,7 +384,7 @@ export default function VotePage() {
       id: 3, 
       name: "César Acuña", 
       party: "Alianza Para el Progreso", 
-      photo: "👨", 
+      photo: "", 
       description: "Exgobernador regional, fundó Alianza Para el Progreso.", 
       education: "Doctor en Educación - Universidad Complutense de Madrid",
       experience: "Exgobernador de La Libertad, fundador de Alianza Para el Progreso, empresario educativo",
@@ -406,7 +403,7 @@ export default function VotePage() {
       id: 4, 
       name: "Ana María Torres", 
       party: "Fuerza Regional", 
-      photo: "👩", 
+      photo: "", 
       description: "Candidata con experiencia en gestión regional.", 
       education: "Licenciada en Administración - Universidad Nacional Mayor de San Marcos",
       experience: "Regidora regional, gestora de proyectos de desarrollo local",
@@ -421,7 +418,7 @@ export default function VotePage() {
       id: 5, 
       name: "Miguel Ángel Castro", 
       party: "Alianza Regional", 
-      photo: "👨", 
+      photo: "", 
       description: "Comprometido con el desarrollo de la región.", 
       education: "Ingeniero Agrónomo - Universidad Nacional Agraria La Molina",
       experience: "Consultor en desarrollo rural, líder comunitario regional",
@@ -431,31 +428,16 @@ export default function VotePage() {
         "Desarrollo agrícola",
         "Mejora de carreteras"
       ] 
-    },
-    { 
-      id: 6, 
-      name: "Laura Mendoza", 
-      party: "Unión Regional", 
-      photo: "👩", 
-      description: "Enfoque en desarrollo social y educativo.", 
-      education: "Trabajadora Social - Pontificia Universidad Católica del Perú",
-      experience: "Directora de programas sociales, activista comunitaria",
-      proposals: [
-        "Programas sociales",
-        "Educación de calidad",
-        "Salud comunitaria",
-        "Desarrollo cultural"
-      ] 
     }
   ];
 
   // Candidatos Distritales
   const distritalCandidates = [
     { 
-      id: 7, 
+      id: 6, 
       name: "Carlos Rojas", 
       party: "Fuerza Distrital", 
-      photo: "👨", 
+      photo: "", 
       description: "Trabajando por el desarrollo del distrito.", 
       education: "Abogado - Universidad de San Martín de Porres",
       experience: "Regidor distrital, abogado especializado en gestión municipal",
@@ -467,10 +449,10 @@ export default function VotePage() {
       ] 
     },
     { 
-      id: 8, 
+      id: 7, 
       name: "Patricia Silva", 
       party: "Alianza Distrital", 
-      photo: "👩", 
+      photo: "", 
       description: "Comprometida con las necesidades locales.", 
       education: "Arquitecta - Universidad Ricardo Palma",
       experience: "Urbanista, consultora en desarrollo urbano sostenible",
@@ -479,21 +461,6 @@ export default function VotePage() {
         "Desarrollo urbano",
         "Medio ambiente",
         "Participación ciudadana"
-      ] 
-    },
-    { 
-      id: 9, 
-      name: "Javier Quispe", 
-      party: "Unión Distrital", 
-      photo: "👨", 
-      description: "Enfoque en la comunidad y participación.", 
-      education: "Contador Público - Universidad Nacional Federico Villarreal",
-      experience: "Líder vecinal, promotor de actividades deportivas y culturales",
-      proposals: [
-        "Participación ciudadana",
-        "Cultura y deporte",
-        "Juventud y educación",
-        "Desarrollo local"
       ] 
     }
   ];
@@ -512,31 +479,63 @@ export default function VotePage() {
     }
   };
 
-  // Datos de ejemplo para regiones y distritos
+  // TODAS LAS REGIONES DEL PERÚ
   const regions = [
-    "Lima Metropolitana",
+    "Amazonas",
+    "Áncash",
+    "Apurímac",
     "Arequipa",
+    "Ayacucho",
+    "Cajamarca",
+    "Callao",
     "Cusco",
-    "La Libertad",
-    "Piura",
-    "Lambayeque",
+    "Huancavelica",
+    "Huánuco",
+    "Ica",
     "Junín",
-    "Ancash",
+    "La Libertad",
+    "Lambayeque",
+    "Lima",
+    "Lima Metropolitana",
+    "Loreto",
+    "Madre de Dios",
+    "Moquegua",
+    "Pasco",
+    "Piura",
     "Puno",
-    "Ica"
+    "San Martín",
+    "Tacna",
+    "Tumbes",
+    "Ucayali"
   ];
 
   const distritosByRegion: Record<string, string[]> = {
-    "Lima Metropolitana": ["Lima Cercado", "Miraflores", "San Isidro", "Surco", "La Molina", "Barranco"],
-    "Arequipa": ["Arequipa", "Cayma", "Yanahuara", "Cerro Colorado", "Sachaca"],
-    "Cusco": ["Cusco", "Wanchaq", "San Sebastián", "San Jerónimo"],
-    "La Libertad": ["Trujillo", "Víctor Larco", "Moche", "Laredo"],
-    "Piura": ["Piura", "Castilla", "Catacaos", "Veintiséis de Octubre"],
-    "Lambayeque": ["Chiclayo", "José Leonardo Ortiz", "La Victoria", "Pimentel"],
-    "Junín": ["Huancayo", "Chilca", "El Tambo", "Pilcomayo"],
-    "Ancash": ["Huaraz", "Carhuaz", "Caraz", "Yungay"],
-    "Puno": ["Puno", "Juliaca", "Ilave", "Ayaviri"],
-    "Ica": ["Ica", "Pisco", "Chincha", "Nazca"]
+    "Amazonas": ["Chachapoyas", "Asunción", "Balsas", "Cheto", "Chiliquín", "Chuquibamba", "Granada", "Huancas", "La Jalca", "Leimebamba", "Levanto", "Magdalena", "Mariscal Castilla", "Molinopampa", "Montevideo", "Olleros", "Quinjalca", "San Francisco de Daguas", "San Isidro de Maino", "Soloco", "Sonche"],
+    "Áncash": ["Huaraz", "Cochabamba", "Colcabamba", "Huanchay", "Independencia", "Jangas", "La Libertad", "Olleros", "Pampas Grande", "Pariacoto", "Pira", "Tarica", "Aija", "Coris", "Huacllán", "La Merced", "Succha", "Antonio Raymondi", "Llamellín", "Aczo"],
+    "Apurímac": ["Abancay", "Chacoche", "Circa", "Curahuasi", "Huanipaca", "Lambrama", "Pichirhua", "San Pedro de Cachora", "Tamburco", "Andahuaylas", "Andarapa", "Chiara", "Huancarama", "Huancaray", "Huayana", "Kishuará", "Pacobamba", "Pacucha", "Pampachiri", "Pomacocha"],
+    "Arequipa": ["Arequipa", "Alto Selva Alegre", "Cayma", "Cerro Colorado", "Characato", "Chiguata", "Jacobo Hunter", "La Joya", "Mariano Melgar", "Miraflores", "Mollebaya", "Paucarpata", "Pocsi", "Polobaya", "Quequeña", "Sabandia", "Sachaca", "San Juan de Siguas", "San Juan de Tarucani", "Santa Isabel de Siguas"],
+    "Ayacucho": ["Ayacucho", "Acocro", "Acos Vinchos", "Carmen Alto", "Chiara", "Ocros", "Pacaycasa", "Quinua", "San José de Ticllas", "San Juan Bautista", "Santiago de Pischa", "Socos", "Tambillo", "Vinchos", "Jesús Nazareno", "Andrés Avelino Cáceres Dorregaray", "Cangallo", "Chuschi", "Los Morochucos", "María Parado de Bellido"],
+    "Cajamarca": ["Cajamarca", "Asunción", "Chetilla", "Cospan", "Encañada", "Jesús", "Llacanora", "Los Baños del Inca", "Magdalena", "Matara", "Namora", "San Juan", "Cajabamba", "Cachachi", "Condebamba", "Sitacocha", "Celendín", "Chumuch", "Cortegana", "Huasmin"],
+    "Callao": ["Callao", "Bellavista", "Carmen de la Legua Reynoso", "La Perla", "La Punta", "Ventanilla", "Mi Perú"],
+    "Cusco": ["Cusco", "Ccorca", "Poroy", "San Jerónimo", "San Sebastián", "Santiago", "Saylla", "Wanchaq", "Acomayo", "Acopia", "Acos", "Mosoc Llacta", "Pomacanchi", "Rondocan", "Sangarará", "Anta", "Ancahuasi", "Cachimayo", "Chinchaypujio", "Huarocondo"],
+    "Huancavelica": ["Huancavelica", "Acobambilla", "Acoria", "Conayca", "Cuenca", "Huachocolpa", "Huayllahuara", "Izcuchaca", "Laria", "Manta", "Mariscal Cáceres", "Moya", "Nuevo Occoro", "Palca", "Pilchaca", "Vilca", "Yauli", "Ascensión", "Huando", "Acobamba"],
+    "Huánuco": ["Huánuco", "Amarilis", "Chinchao", "Churubamba", "Margos", "Quisqui", "San Francisco de Cayran", "San Pedro de Chaulán", "Santa María del Valle", "Yarumayo", "Pillco Marca", "Ambo", "Cayna", "Colpas", "Conchamarca", "Huácar", "San Francisco", "San Rafael", "Tomay Kichwa", "Dos de Mayo"],
+    "Ica": ["Ica", "La Tinguiña", "Los Aquijes", "Ocucaje", "Pachacutec", "Parcona", "Pueblo Nuevo", "Salas", "San José de Los Molinos", "San Juan Bautista", "Santiago", "Subtanjalla", "Tate", "Yauca del Rosario", "Chincha", "Alto Larán", "Chavin", "Chincha Baja", "El Carmen", "Grocio Prado"],
+    "Junín": ["Huancayo", "Carhuacallanga", "Chacapampa", "Chicche", "Chilca", "Chongos Alto", "Chupuro", "Colca", "Cullhuas", "El Tambo", "Huacrapuquio", "Hualhuas", "Huancan", "Huasicancha", "Huayucachi", "Ingenio", "Pariahuanca", "Pilcomayo", "Pucará", "Quichuay"],
+    "La Libertad": ["Trujillo", "El Porvenir", "Florencia de Mora", "Huanchaco", "La Esperanza", "Laredo", "Moche", "Poroto", "Salaverry", "Simbal", "Víctor Larco Herrera", "Ascope", "Chicama", "Chocope", "Magdalena de Cao", "Paiján", "Rázuri", "Santiago de Cao", "Casa Grande", "Bolívar"],
+    "Lambayeque": ["Chiclayo", "Chongoyape", "Eten", "Eten Puerto", "José Leonardo Ortiz", "La Victoria", "Lagunas", "Monsefú", "Nueva Arica", "Oyotún", "Picsi", "Pimentel", "Reque", "Santa Rosa", "Saña", "Cayaltí", "Pátapo", "Pomalca", "Pucalá", "Tumán"],
+    "Lima": ["Barranca", "Paramonga", "Pativilca", "Supe", "Supe Puerto", "Cajatambo", "Copa", "Gorgor", "Huancapon", "Manas", "Canta", "Arahuay", "Huamantanga", "Huaros", "Lachaqui", "San Buenaventura", "Santa Rosa de Quives", "Cañete", "Asia", "Calango"],
+    "Lima Metropolitana": ["Lima", "Ancón", "Ate", "Barranco", "Breña", "Carabayllo", "Chaclacayo", "Chorrillos", "Cieneguilla", "Comas", "El Agustino", "Independencia", "Jesús María", "La Molina", "La Victoria", "Lince", "Los Olivos", "Lurigancho", "Lurín", "Magdalena del Mar"],
+    "Loreto": ["Maynas", "Iquitos", "Alto Nanay", "Fernando Lores", "Indiana", "Las Amazonas", "Mazan", "Napo", "Punchana", "Torres Causana", "Belén", "San Juan Bautista", "Alto Amazonas", "Yurimaguas", "Balsapuerto", "Jeberos", "Lagunas", "Santa Cruz", "Teniente César López Rojas", "Datem del Marañón"],
+    "Madre de Dios": ["Tambopata", "Inambari", "Las Piedras", "Laberinto", "Manu", "Fitzcarrald", "Madre de Dios", "Huepetuhe", "Tahuamanu", "Iberia", "Iñapari"],
+    "Moquegua": ["Mariscal Nieto", "Moquegua", "Carumas", "Cuchumbaya", "Samegua", "San Cristóbal", "Torata", "General Sánchez Cerro", "Omate", "Chojata", "Coalaque", "Ichuña", "La Capilla", "Lloque", "Matalaque", "Puquina", "Quinistaquillas", "Ubinas", "Yunga", "Ilo"],
+    "Pasco": ["Pasco", "Chaupimarca", "Huachon", "Huariaca", "Huayllay", "Ninacaca", "Pallanchacra", "Paucartambo", "San Francisco de Asís de Yarusyacan", "Simon Bolívar", "Ticlacayan", "Tinyahuarco", "Vicco", "Yanacancha", "Daniel Alcides Carrión", "Yanahuanca", "Chacayan", "Goyllarisquizga", "Paucar", "San Pedro de Pillao"],
+    "Piura": ["Piura", "Castilla", "Catacaos", "Cura Mori", "El Tallán", "La Arena", "La Unión", "Las Lomas", "Tambo Grande", "Ayabaca", "Frias", "Jilili", "Lagunas", "Montero", "Pacaipampa", "Paimas", "Sapillica", "Sicchez", "Suyo", "Huancabamba"],
+    "Puno": ["Puno", "Acora", "Amantani", "Atuncolla", "Capachica", "Chucuito", "Coata", "Huata", "Mañazo", "Paucarcolla", "Pichacani", "Platería", "San Antonio", "Tiquillaca", "Vilque", "Azángaro", "Achaya", "Arapa", "Asillo", "Caminaca"],
+    "San Martín": ["Moyobamba", "Calzada", "Habana", "Jepelacio", "Soritor", "Yantalo", "Bellavista", "Alto Biavo", "Bajo Biavo", "Huallaga", "San Pablo", "San Rafael", "El Dorado", "Agua Blanca", "San José de Sisa", "San Martín", "Shapaja", "Chazuta", "Chipurana", "Huimbayoc"],
+    "Tacna": ["Tacna", "Alto de la Alianza", "Calana", "Ciudad Nueva", "Inclan", "Pachia", "Palca", "Pocollay", "Sama", "Coronel Gregorio Albarracín Lanchipa", "Candarave", "Cairani", "Camilaca", "Curibaya", "Huanuara", "Quilahuani", "Jorge Basadre", "Locumba", "Ilabaya", "Ite"],
+    "Tumbes": ["Tumbes", "Corrales", "La Cruz", "Pampas de Hospital", "San Jacinto", "San Juan de la Virgen", "Contralmirante Villar", "Zorritos", "Casitas", "Canoas de Punta Sal", "Zarumilla", "Aguas Verdes", "Matapalo", "Papayal"],
+    "Ucayali": ["Coronel Portillo", "Callería", "Campoverde", "Iparia", "Masisea", "Yarinacocha", "Nueva Requena", "Manantay", "Atalaya", "Raymondi", "Sepahua", "Tahuania", "Yurúa", "Padre Abad", "Irazola", "Curimaná", "Neshuya", "Alexander Von Humboldt", "Purús", "Purús"]
   };
 
   // Función para calcular edad
@@ -635,63 +634,67 @@ export default function VotePage() {
     setIsSubmitting(false);
   };
 
-  // Si está autenticado, muestra la página de votación con los candidatos
+  // SI está autenticado, mostrar la INTERFAZ MEJORADA de candidatos
   if (isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4 sm:p-6 md:p-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Mensaje de verificación exitosa */}
-          <div className="text-center mb-8 sm:mb-12">
-            <div className="inline-block bg-green-500/20 border border-green-500/30 rounded-xl sm:rounded-2xl px-4 sm:px-6 md:px-8 py-3 sm:py-4 mb-6 sm:mb-8">
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-green-400">Identidad verificada exitosamente</h2>
-              <p className="text-green-300 mt-2 text-sm sm:text-base">Ahora puede proceder a votar</p>
-            </div>
-            
-            {/* Título y descripción */}
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4">Candidatos</h1>
-            <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto px-4">
-              Conozca las propuestas y trayectoria de cada candidato para tomar una decisión informada.
-            </p>
-          </div>
-
-          {/* Pestañas de categorías */}
-          <div className="flex justify-center mb-8 sm:mb-12 overflow-x-auto pb-2">
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-1.5 sm:p-2 flex space-x-1 sm:space-x-2 shadow-lg">
-              <button
-                onClick={() => setActiveCategory('presidencial')}
-                className={`px-4 sm:px-6 md:px-12 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all whitespace-nowrap ${
-                  activeCategory === 'presidencial'
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                }`}
-              >
-                Presidencial
-              </button>
-              <button
-                onClick={() => setActiveCategory('regional')}
-                className={`px-4 sm:px-6 md:px-12 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all whitespace-nowrap ${
-                  activeCategory === 'regional'
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                }`}
-              >
-                Regional
-              </button>
-              <button
-                onClick={() => setActiveCategory('distrital')}
-                className={`px-4 sm:px-6 md:px-12 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-all whitespace-nowrap ${
-                  activeCategory === 'distrital'
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                }`}
-              >
-                Distrital
-              </button>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+        {/* Header */}
+        <div className="bg-gray-900/80 backdrop-blur-sm border-b border-gray-700/50">
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Button
+                  onClick={() => setIsAuthenticated(false)}
+                  variant="ghost"
+                  className="text-gray-300 hover:text-white hover:bg-gray-800"
+                >
+                  <ArrowLeft className="h-5 w-5 mr-2" />
+                  Volver
+                </Button>
+                <div>
+                  <h1 className="text-2xl font-bold text-white">Sistema de Votación</h1>
+                  <p className="text-gray-400">Seleccione su candidato preferido</p>
+                </div>
+              </div>
+              <Badge variant="secondary" className="bg-green-600 text-white">
+                Identidad Verificada ✓
+              </Badge>
             </div>
           </div>
+        </div>
 
-          {/* Grid de candidatos - 2 columnas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        {/* Categorías */}
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            {categories.map((category) => (
+              <Card 
+                key={category.id}
+                className={`cursor-pointer transition-all duration-300 ${
+                  activeCategory === category.id 
+                    ? 'bg-blue-600 border-blue-500 transform scale-105' 
+                    : 'bg-gray-800 border-gray-700 hover:bg-gray-750'
+                }`}
+                onClick={() => setActiveCategory(category.id)}
+              >
+                <CardContent className="p-6 text-center">
+                  <category.icon className={`h-8 w-8 mx-auto mb-3 ${
+                    activeCategory === category.id ? 'text-white' : 'text-blue-400'
+                  }`} />
+                  <h3 className="font-semibold text-lg text-white">
+                    {category.name}
+                  </h3>
+                  <p className={`text-sm ${
+                    activeCategory === category.id ? 'text-blue-100' : 'text-gray-400'
+                  }`}>
+                    {getCandidatesByCategory().length} candidatos
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Grid de candidatos MEJORADO */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {getCandidatesByCategory().map((candidate) => (
               <CandidateCard
                 key={candidate.id}
@@ -708,44 +711,50 @@ export default function VotePage() {
             ))}
           </div>
 
-          {/* Botón para volver al inicio */}
-          <div className="text-center mt-12">
-            <Button 
-              onClick={() => setIsAuthenticated(false)}
-              className="bg-gray-600 hover:bg-gray-700"
-            >
-              Volver al Inicio
-            </Button>
-          </div>
-
-          {/* Modal de Confirmación */}
-          <ConfirmVoteModal
-            isOpen={showConfirmModal}
-            onClose={handleCancelVote}
-            onConfirm={handleConfirmVote}
-            candidateName={selectedCandidate?.name || ""}
-            candidateParty={selectedCandidate?.party || ""}
-            voterData={{
-              dni: voterDni,
-              name: `${voterName} ${voterApellidos}`,
-              location: `${voterDistrito}, ${voterRegion}`
-            }}
-          />
-
-          {/* Toast de éxito */}
-          {showSuccessToast && (
-            <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5">
-              <div className="bg-gray-900 text-white rounded-lg shadow-2xl px-6 py-4 flex items-center gap-3 border border-gray-700">
-                <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+          {/* Información de seguridad */}
+          <Card className="mt-8 bg-gray-800 border-gray-700">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-3 mb-3">
+                  <Shield className="h-6 w-6 text-green-400" />
+                  <h3 className="text-lg font-semibold text-white">Votación Segura</h3>
                 </div>
-                <span className="font-medium">¡Voto registrado exitosamente!</span>
+                <p className="text-gray-400">
+                  Su voto es anónimo y está protegido con cifrado de grado militar. 
+                  Una vez confirmado, no podrá ser modificado.
+                </p>
               </div>
-            </div>
-          )}
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Modal de Confirmación */}
+        <ConfirmVoteModal
+          isOpen={showConfirmModal}
+          onClose={handleCancelVote}
+          onConfirm={handleConfirmVote}
+          candidateName={selectedCandidate?.name || ""}
+          candidateParty={selectedCandidate?.party || ""}
+          voterData={{
+            dni: voterDni,
+            name: `${voterName} ${voterApellidos}`,
+            location: `${voterDistrito}, ${voterRegion}`
+          }}
+        />
+
+        {/* Toast de éxito */}
+        {showSuccessToast && (
+          <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5">
+            <div className="bg-gray-900 text-white rounded-lg shadow-2xl px-6 py-4 flex items-center gap-3 border border-gray-700">
+              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <span className="font-medium">¡Voto registrado exitosamente!</span>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
