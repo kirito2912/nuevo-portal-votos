@@ -9,6 +9,7 @@ import '../../styles/admin/index.css';
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('resultados');
+  const [selectedCategory, setSelectedCategory] = useState<'presidencial' | 'regional' | 'distrital'>('presidencial');
 
   const tabs = [
     { id: 'resultados', label: 'Resultados', icon: BarChart3 },
@@ -107,10 +108,10 @@ export default function DashboardPage() {
 
       {/* Contenido de las Tabs */}
       <div>
-        {activeTab === 'resultados' && <ResultsTab />}
+        {activeTab === 'resultados' && <ResultsTab selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />}
         {activeTab === 'procesamiento' && <ProcessingTab />}
         {activeTab === 'entrenamiento' && <TrainingTab />}
-        {activeTab === 'analisis' && <AnalysisTab />}
+        {activeTab === 'analisis' && <AnalysisTab selectedCategory={selectedCategory} />}
       </div>
     </AdminLayout>
   );

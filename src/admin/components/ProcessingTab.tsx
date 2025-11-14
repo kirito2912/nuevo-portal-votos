@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Database, CheckCircle2, RefreshCw, Trash2, Layers, Info, RotateCcw, Table, AlertTriangle, TrendingUp } from 'lucide-react';
+import { Database, CheckCircle2, RefreshCw, Trash2, Layers, Info, RotateCcw, Table, AlertTriangle } from 'lucide-react';
 import '../../styles/admin/index.css';
 
 export default function ProcessingTab() {
