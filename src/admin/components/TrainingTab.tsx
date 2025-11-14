@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Brain, RefreshCw, Play, Info, Database } from 'lucide-react';
+import { RefreshCw, Play, Info } from 'lucide-react';
 import '../../styles/admin/index.css';
 
 export default function TrainingTab() {

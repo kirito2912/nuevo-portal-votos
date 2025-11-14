@@ -7,7 +7,8 @@
  * 3. Implementar los endpoints en el backend
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+// Variable preparada para cuando se implemente el backend
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 export interface AnalysisStats {
   activeVoters: number;
