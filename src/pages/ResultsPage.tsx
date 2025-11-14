@@ -225,25 +225,25 @@ export default function ResultsPage() {
   ];
 
   return (
-    <div className="space-y-8">
-      <header className="space-y-3">
-        <p className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-blue-400/80">
-          <Target size={16} />
+    <div className="space-y-6 sm:space-y-8">
+      <header className="space-y-2 sm:space-y-3">
+        <p className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold uppercase tracking-wide text-blue-400/80">
+          <Target size={14} className="sm:w-4 sm:h-4" />
           Monitoreo Electoral
         </p>
-        <h1 className="text-4xl font-bold">Resultados Electorales</h1>
-        <p className="text-gray-400">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Resultados Electorales</h1>
+        <p className="text-sm sm:text-base text-gray-400">
           Conteo en tiempo real de votos registrados. Selecciona una categoría para explorar métricas
           detalladas y comparar el desempeño entre agrupaciones.
         </p>
       </header>
 
-      <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-dark-card/60 p-2 backdrop-blur border border-gray-800">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 rounded-xl sm:rounded-2xl bg-dark-card/60 p-1.5 sm:p-2 backdrop-blur border border-gray-800">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-bg ${
+            className={`rounded-lg sm:rounded-xl px-3 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-dark-bg ${
               activeTab === tab.id
                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
                 : 'text-gray-400 hover:text-white hover:bg-gray-800/70'
@@ -254,7 +254,7 @@ export default function ResultsPage() {
         ))}
       </div>
 
-      <section className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -289,7 +289,7 @@ export default function ResultsPage() {
           </span>
         </header>
 
-        <div className="h-[420px]">
+        <div className="h-[300px] sm:h-[350px] md:h-[420px]">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={activeData.chart} margin={{ top: 20, right: 20, bottom: 12, left: 0 }}>
               <defs>
@@ -353,8 +353,8 @@ export default function ResultsPage() {
           </span>
         </header>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-800 text-sm">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className="min-w-full divide-y divide-gray-800 text-xs sm:text-sm">
             <thead>
               <tr className="text-left text-xs uppercase tracking-wide text-gray-400">
                 <th className="pb-3 pr-6">Candidato</th>

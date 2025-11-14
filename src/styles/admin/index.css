@@ -14,8 +14,20 @@
 }
 
 .admin-main-content {
-  padding: var(--admin-spacing-lg);
+  padding: 1rem;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .admin-main-content {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .admin-main-content {
+    padding: var(--admin-spacing-lg);
+  }
 }
 
