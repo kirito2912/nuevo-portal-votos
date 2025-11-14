@@ -3,7 +3,7 @@ import { Info, CheckCircle2, AlertTriangle } from 'lucide-react';
 import '../../styles/admin/index.css';
 
 export default function ResultsTab() {
-  const [hasNullData, setHasNullData] = useState(false); // Simulado: false = OK, true = Warning
+  const [hasNullData] = useState(false); // Simulado: false = OK, true = Warning
 
   return (
     <div className="results-section">
