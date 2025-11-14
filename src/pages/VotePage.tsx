@@ -240,7 +240,7 @@ function ConfirmVoteModal({
 }
 
 // Componente CandidateCard con diseño de cuadros
-function CandidateCard({ id, name, party, description, proposals, photo, education, experience, onVote }: CandidateCardProps) {
+function CandidateCard({ id: _id, name, party, description, proposals, photo, education, experience, onVote }: CandidateCardProps) {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   const candidateData = {

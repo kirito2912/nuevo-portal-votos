@@ -7,7 +7,8 @@
  * 3. Implementar los endpoints en el backend (FastAPI + Scikit-learn)
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+// Variable preparada para cuando se implemente el backend
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 export interface TrainingStats {
   validVotes: number;
@@ -66,7 +67,7 @@ export const getTrainingStats = async (): Promise<TrainingStats> => {
  * Inicia el entrenamiento del modelo
  */
 export const startTraining = async (
-  config: TrainingConfig
+  _config: TrainingConfig
 ): Promise<TrainingResult> => {
   try {
     // TODO: Descomentar cuando el backend esté listo
@@ -164,8 +165,8 @@ export const getTrainedModels = async (): Promise<Array<{
  * Hace una predicción con un modelo entrenado
  */
 export const predict = async (
-  modelId: number,
-  features: { edad: number; educacion: string; genero: string }
+  _modelId: number,
+  _features: { edad: number; educacion: string; genero: string }
 ): Promise<{
   predictedCandidate: number;
   probabilities: Array<{ candidate: number; probability: number }>;
