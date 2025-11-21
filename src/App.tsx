@@ -4,7 +4,7 @@ import HomePage from './pages/HomePage';
 import VotePage from './pages/VotePage';
 import ResultsPage from './pages/ResultsPage';
 import AboutPage from './pages/AboutPage';
-import LoginPage from './admin/pages/LoginPage';
+import LoginPage from './pages/LoginPage';
 import DashboardPage from './admin/pages/DashboardPage';
 
 function App() {
