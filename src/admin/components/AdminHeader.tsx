@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { CheckSquare2, CheckCircle2, ArrowRight } from 'lucide-react';
+import { logout } from '@/admin/auth';
 import '../../styles/admin/index.css';
 
 export default function AdminHeader() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    logout();
     navigate('/admin/login');
   };
 

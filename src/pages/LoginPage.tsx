@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login } from '@/admin/auth';
 import { Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
@@ -16,6 +17,7 @@ export default function LoginPage() {
     // Simulación de login
     setTimeout(() => {
       if (email && password) {
+        login({ email });
         navigate('/admin/dashboard');
       }
       setIsLoading(false);
