@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +6,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Shield, Lock, User, Calendar, MapPin, AlertCircle, X, BookOpen, Target, Award, ArrowLeft } from "lucide-react";
+import {
+  createVotante,
+  getVotanteByDni,
+  getVotanteStatus,
+  getCandidatosPresidenciales,
+  getCandidatosRegionales,
+  getCandidatosDistritales,
+  createVotoPresidencial,
+  createVotoRegional,
+  createVotoDistrital,
+  type Candidato
+} from "@/services/voteService";
 
 // Componente Modal de Detalles del Candidato
 function CandidateDetailsModal({
@@ -248,7 +260,7 @@ function ConfirmVoteModal({
 }
 
 // Componente CandidateCard MEJORADO
-function CandidateCard({ id: _id, name, party, description, proposals, photo, education, experience, onVote }: any) {
+function CandidateCard({ id: _id, name, party, description, proposals, photo, education, experience, onVote, disabled = false }: any) {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   const candidateData = {
@@ -335,10 +347,11 @@ function CandidateCard({ id: _id, name, party, description, proposals, photo, ed
             </Button>
             <Button
               onClick={onVote}
-              className="flex-1 bg-green-600 hover:bg-green-700"
+              disabled={disabled}
+              className={`flex-1 ${disabled ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-green-600 hover:bg-green-700'}`}
             >
               <Award className="h-4 w-4 mr-2" />
-              Votar
+              {disabled ? 'Ya Votaste' : 'Votar'}
             </Button>
           </div>
         </CardContent>
@@ -376,6 +389,61 @@ export default function VotePage() {
     photo: string;
   } | null>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
+  
+  // Estados para candidatos desde BD
+  const [presidentialCandidatesFromDB, setPresidentialCandidatesFromDB] = useState<Candidato[]>([]);
+  const [regionalCandidatesFromDB, setRegionalCandidatesFromDB] = useState<Candidato[]>([]);
+  const [distritalCandidatesFromDB, setDistritalCandidatesFromDB] = useState<Candidato[]>([]);
+  const [loadingCandidates, setLoadingCandidates] = useState(false);
+  
+  // Estados para controlar qué categorías ya fueron votadas
+  const [hasVotedPresidencial, setHasVotedPresidencial] = useState(false);
+  const [hasVotedRegional, setHasVotedRegional] = useState(false);
+  const [hasVotedDistrital, setHasVotedDistrital] = useState(false);
+  
+  // Cargar candidatos desde BD cuando se autentica
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadCandidatesFromDB();
+    }
+  }, [isAuthenticated]);
+  
+  const loadCandidatesFromDB = async () => {
+    setLoadingCandidates(true);
+    try {
+      const [pres, reg, dist] = await Promise.all([
+        getCandidatosPresidenciales().catch((err) => {
+          console.error("Error cargando candidatos presidenciales:", err);
+          return [];
+        }),
+        getCandidatosRegionales().catch((err) => {
+          console.error("Error cargando candidatos regionales:", err);
+          return [];
+        }),
+        getCandidatosDistritales().catch((err) => {
+          console.error("Error cargando candidatos distritales:", err);
+          return [];
+        })
+      ]);
+      
+      console.log("Candidatos cargados desde BD:", {
+        presidenciales: pres.length,
+        regionales: reg.length,
+        distritales: dist.length,
+        pres: pres,
+        reg: reg,
+        dist: dist
+      });
+      
+      setPresidentialCandidatesFromDB(pres);
+      setRegionalCandidatesFromDB(reg);
+      setDistritalCandidatesFromDB(dist);
+    } catch (error) {
+      console.error("Error cargando candidatos:", error);
+    } finally {
+      setLoadingCandidates(false);
+    }
+  };
 
   // Categorías para las pestañas
   const categories = [
@@ -599,12 +667,50 @@ export default function VotePage() {
 
   // Obtener candidatos según la categoría activa
   const getCandidatesByCategory = () => {
+    // Si hay candidatos desde BD, usarlos; si no, usar los hardcodeados
     switch (activeCategory) {
       case 'presidencial':
+        if (presidentialCandidatesFromDB.length > 0) {
+          // Mapear candidatos de BD al formato esperado
+          return presidentialCandidatesFromDB.map(c => ({
+            id: c.id,
+            name: c.nombre_completo,
+            party: "Partido Político",
+            photo: "👤",
+            description: `Candidato presidencial: ${c.nombre_completo}`,
+            education: "Información no disponible",
+            experience: "Información no disponible",
+            proposals: ["Propuesta 1", "Propuesta 2", "Propuesta 3"]
+          }));
+        }
         return presidentialCandidates;
       case 'regional':
+        if (regionalCandidatesFromDB.length > 0) {
+          return regionalCandidatesFromDB.map(c => ({
+            id: c.id,
+            name: c.nombre_completo,
+            party: "Partido Regional",
+            photo: "👤",
+            description: `Candidato regional: ${c.nombre_completo}`,
+            education: "Información no disponible",
+            experience: "Información no disponible",
+            proposals: ["Desarrollo regional", "Infraestructura", "Servicios públicos"]
+          }));
+        }
         return regionalCandidates;
       case 'distrital':
+        if (distritalCandidatesFromDB.length > 0) {
+          return distritalCandidatesFromDB.map(c => ({
+            id: c.id,
+            name: c.nombre_completo,
+            party: "Partido Distrital",
+            photo: "👤",
+            description: `Candidato distrital: ${c.nombre_completo}`,
+            education: "Información no disponible",
+            experience: "Información no disponible",
+            proposals: ["Servicios locales", "Seguridad ciudadana", "Desarrollo comunitario"]
+          }));
+        }
         return distritalCandidates;
       default:
         return presidentialCandidates;
@@ -699,6 +805,20 @@ export default function VotePage() {
 
   // Función para manejar el clic en votar (abre el modal)
   const handleVoteClick = (candidateId: number, candidateName: string, candidateParty: string, candidatePhoto: string) => {
+    // Verificar si ya votó en esta categoría
+    if (activeCategory === 'presidencial' && hasVotedPresidencial) {
+      setError("Ya has ejercido tu voto presidencial. No puedes votar por otro candidato presidencial.");
+      return;
+    }
+    if (activeCategory === 'regional' && hasVotedRegional) {
+      setError("Ya has ejercido tu voto regional. No puedes votar por otro candidato regional.");
+      return;
+    }
+    if (activeCategory === 'distrital' && hasVotedDistrital) {
+      setError("Ya has ejercido tu voto distrital. No puedes votar por otro candidato distrital.");
+      return;
+    }
+    
     setSelectedCandidate({
       id: candidateId,
       name: candidateName,
@@ -709,9 +829,124 @@ export default function VotePage() {
   };
 
   // Función para confirmar el voto (después del modal)
-  const handleConfirmVote = () => {
-    if (selectedCandidate) {
-      console.log(`Voto registrado para: ${selectedCandidate.name} (ID: ${selectedCandidate.id})`);
+  // Función para confirmar el voto - AQUÍ SE GUARDA TODO EN LA BD
+  const handleConfirmVote = async () => {
+    if (!selectedCandidate) {
+      setError("Error: No se pudo identificar al candidato");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setError("");
+      
+      // PASO 1: Verificar si el votante ya existe en la BD
+      let votanteId: number;
+      const votanteExistente = await getVotanteByDni(voterDni);
+      
+      if (votanteExistente) {
+        // Verificar el estado completo del votante antes de permitir votar
+        const status = await getVotanteStatus(voterDni);
+        
+        // Bloquear si ya votó en todas las categorías
+        if (status.has_all_votes) {
+          setError("Este DNI ya ha ejercido todos sus votos (presidencial, regional y distrital). No puede votar nuevamente.");
+          setShowConfirmModal(false);
+          setIsSubmitting(false);
+          return;
+        }
+        
+        // Bloquear si ya votó en la categoría específica
+        if (activeCategory === 'presidencial' && !status.can_vote_presidencial) {
+          setError("Este DNI ya ha ejercido su voto presidencial.");
+          setShowConfirmModal(false);
+          setIsSubmitting(false);
+          return;
+        }
+        if (activeCategory === 'regional' && !status.can_vote_regional) {
+          setError("Este DNI ya ha ejercido su voto regional.");
+          setShowConfirmModal(false);
+          setIsSubmitting(false);
+          return;
+        }
+        if (activeCategory === 'distrital' && !status.can_vote_distrital) {
+          setError("Este DNI ya ha ejercido su voto distrital.");
+          setShowConfirmModal(false);
+          setIsSubmitting(false);
+          return;
+        }
+        
+        votanteId = votanteExistente.id_votantes;
+      } else {
+        // Si no existe, crear nuevo votante en la BD
+        try {
+          const nuevoVotante = await createVotante({
+            dni: voterDni,
+            nombres: voterName,
+            apellidos: voterApellidos,
+            fecha_nacimiento: voterFechaNacimiento,
+            region: voterRegion,
+            distrito: voterDistrito
+          });
+          votanteId = nuevoVotante.id_votantes;
+        } catch (createError: any) {
+          console.error("Error al crear votante:", createError);
+          if (createError.message?.includes("Failed to fetch") || createError.message?.includes("ERR_CONNECTION_REFUSED")) {
+            throw new Error("No se puede conectar al servidor. Asegúrese de que el backend esté corriendo en http://localhost:8000");
+          }
+          if (createError.message?.includes("ya está registrado")) {
+            // Si el DNI ya existe (caso de race condition), intentar obtenerlo de nuevo
+            const votante = await getVotanteByDni(voterDni);
+            if (votante) {
+              votanteId = votante.id_votantes;
+            } else {
+              throw new Error("No se pudo registrar el votante. Intente nuevamente.");
+            }
+          } else {
+            throw new Error("No se pudo registrar el votante. Verifique su conexión al servidor.");
+          }
+        }
+      }
+      
+      // PASO 2: Registrar el voto en la BD según la categoría
+      try {
+        if (activeCategory === 'presidencial') {
+          await createVotoPresidencial(votanteId, selectedCandidate.id);
+          setHasVotedPresidencial(true); // Marcar que ya votó presidencial
+        } else if (activeCategory === 'regional') {
+          if (!voterRegion) {
+            throw new Error("Debe seleccionar una región para votar por candidato regional");
+          }
+          console.log("Votando regional:", { votanteId, candidatoId: selectedCandidate.id, region: voterRegion });
+          await createVotoRegional(votanteId, selectedCandidate.id, voterRegion);
+          setHasVotedRegional(true); // Marcar que ya votó regional
+        } else if (activeCategory === 'distrital') {
+          if (!voterDistrito) {
+            throw new Error("Debe seleccionar un distrito para votar por candidato distrital");
+          }
+          console.log("Votando distrital:", { votanteId, candidatoId: selectedCandidate.id, distrito: voterDistrito });
+          await createVotoDistrital(votanteId, selectedCandidate.id, voterDistrito);
+          setHasVotedDistrital(true); // Marcar que ya votó distrital
+        }
+      } catch (voteError: any) {
+        console.error("Error al registrar voto:", voteError);
+        const errorMessage = voteError.message || String(voteError);
+        
+        if (errorMessage.includes("Failed to fetch") || errorMessage.includes("ERR_CONNECTION_REFUSED")) {
+          throw new Error("No se puede conectar al servidor. Asegúrese de que el backend esté corriendo en http://localhost:8000");
+        }
+        if (errorMessage.includes("ya ha ejercido")) {
+          throw voteError;
+        }
+        if (errorMessage.includes("Candidato no encontrado") || errorMessage.includes("404")) {
+          throw new Error(`Candidato no encontrado. Por favor, recarga la página para actualizar la lista de candidatos.`);
+        }
+        if (errorMessage.includes("Votante no encontrado")) {
+          throw new Error("Error: El votante no se pudo registrar correctamente. Intente nuevamente.");
+        }
+        throw new Error(`Error al registrar el voto: ${errorMessage}`);
+      }
+      
       setShowConfirmModal(false);
       setSelectedCandidate(null);
       
@@ -722,6 +957,24 @@ export default function VotePage() {
       setTimeout(() => {
         setShowSuccessToast(false);
       }, 3000);
+      
+      // Recargar candidatos para actualizar conteos
+      await loadCandidatesFromDB();
+      
+      // Si votó presidencial, cambiar a otra categoría automáticamente
+      if (activeCategory === 'presidencial') {
+        if (!hasVotedRegional) {
+          setActiveCategory('regional');
+        } else if (!hasVotedDistrital) {
+          setActiveCategory('distrital');
+        }
+      }
+    } catch (error) {
+      console.error("Error al registrar voto:", error);
+      setError(error instanceof Error ? error.message : "Error al registrar el voto");
+      setShowConfirmModal(false);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -731,13 +984,13 @@ export default function VotePage() {
     setSelectedCandidate(null);
   };
 
-  // Envío del formulario de acceso
+  // Envío del formulario de acceso - SOLO VALIDA, NO GUARDA EN BD
   const handleAccessSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError("");
     
-    // Validaciones
+    // Validaciones locales (sin conexión a BD)
     if (!voterDni || !voterName || !voterApellidos || !voterFechaNacimiento || !voterRegion || !voterDistrito) {
       setError("Por favor complete todos los campos requeridos");
       setIsSubmitting(false);
@@ -759,12 +1012,28 @@ export default function VotePage() {
       return;
     }
 
-    // Simular verificación (en producción aquí iría la API)
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    
-    setIsMinor(false);
-    setIsAuthenticated(true);
-    setIsSubmitting(false);
+    try {
+      // Consultar estado del votante en el backend
+      const status = await getVotanteStatus(voterDni);
+
+      // Si ya votó en las tres categorías, bloquear el acceso
+      if (status.has_all_votes ||
+        (!status.can_vote_presidencial && !status.can_vote_regional && !status.can_vote_distrital)
+      ) {
+        setError("Este DNI ya ha ejercido todos sus votos (presidencial, regional y distrital). No puede votar nuevamente.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Si aún le falta votar en alguna categoría, permitir acceso a la pantalla de candidatos
+      setIsMinor(false);
+      setIsAuthenticated(true);
+    } catch (err) {
+      console.error("Error al verificar estado del votante:", err);
+      setError("No se pudo verificar el estado del votante. Intente nuevamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // SI está autenticado, mostrar la INTERFAZ MEJORADA de candidatos
@@ -799,49 +1068,97 @@ export default function VotePage() {
         {/* Categorías */}
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            {categories.map((category) => (
-              <Card 
-                key={category.id}
-                className={`cursor-pointer transition-all duration-300 ${
-                  activeCategory === category.id 
-                    ? 'bg-blue-600 border-blue-500 transform scale-105' 
-                    : 'bg-gray-800 border-gray-700 hover:bg-gray-750'
-                }`}
-                onClick={() => setActiveCategory(category.id)}
-              >
-                <CardContent className="p-6 text-center">
-                  <category.icon className={`h-8 w-8 mx-auto mb-3 ${
-                    activeCategory === category.id ? 'text-white' : 'text-blue-400'
-                  }`} />
-                  <h3 className="font-semibold text-lg text-white">
-                    {category.name}
-                  </h3>
-                  <p className={`text-sm ${
-                    activeCategory === category.id ? 'text-blue-100' : 'text-gray-400'
-                  }`}>
-                    {getCandidatesByCategory().length} candidatos
-                  </p>
+            {categories.map((category) => {
+              const hasVoted = 
+                (category.id === 'presidencial' && hasVotedPresidencial) ||
+                (category.id === 'regional' && hasVotedRegional) ||
+                (category.id === 'distrital' && hasVotedDistrital);
+              
+              return (
+                <Card 
+                  key={category.id}
+                  className={`cursor-pointer transition-all duration-300 ${
+                    activeCategory === category.id 
+                      ? 'bg-blue-600 border-blue-500 transform scale-105' 
+                      : 'bg-gray-800 border-gray-700 hover:bg-gray-750'
+                  } ${hasVoted ? 'ring-2 ring-green-500' : ''}`}
+                  onClick={() => setActiveCategory(category.id)}
+                >
+                  <CardContent className="p-6 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <category.icon className={`h-8 w-8 ${
+                        activeCategory === category.id ? 'text-white' : 'text-blue-400'
+                      }`} />
+                      {hasVoted && (
+                        <Badge className="bg-green-600 text-white">
+                          ✓ Votado
+                        </Badge>
+                      )}
+                    </div>
+                    <h3 className="font-semibold text-lg text-white">
+                      {category.name}
+                    </h3>
+                    <p className={`text-sm ${
+                      activeCategory === category.id ? 'text-blue-100' : 'text-gray-400'
+                    }`}>
+                      {getCandidatesByCategory().length} candidatos
+                      {hasVoted && ' • Ya votaste'}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Mensaje si ya votó en esta categoría */}
+          {((activeCategory === 'presidencial' && hasVotedPresidencial) ||
+            (activeCategory === 'regional' && hasVotedRegional) ||
+            (activeCategory === 'distrital' && hasVotedDistrital)) && (
+            <div className="container mx-auto px-4 mb-6">
+              <Card className="bg-green-900/30 border-green-500">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                      <Shield className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold">Voto Registrado</h3>
+                      <p className="text-green-200 text-sm">
+                        Ya has ejercido tu voto en la categoría {activeCategory === 'presidencial' ? 'Presidencial' : activeCategory === 'regional' ? 'Regional' : 'Distrital'}. 
+                        No puedes votar por otro candidato en esta categoría.
+                      </p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+            </div>
+          )}
 
           {/* Grid de candidatos MEJORADO */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {getCandidatesByCategory().map((candidate) => (
-              <CandidateCard
-                key={candidate.id}
-                id={candidate.id}
-                name={candidate.name}
-                party={candidate.party}
-                description={candidate.description}
-                proposals={candidate.proposals}
-                photo={candidate.photo}
-                education={candidate.education}
-                experience={candidate.experience}
-                onVote={() => handleVoteClick(candidate.id, candidate.name, candidate.party, candidate.photo)}
-              />
-            ))}
+            {getCandidatesByCategory().map((candidate) => {
+              // Determinar si esta categoría ya fue votada
+              const isVoted = 
+                (activeCategory === 'presidencial' && hasVotedPresidencial) ||
+                (activeCategory === 'regional' && hasVotedRegional) ||
+                (activeCategory === 'distrital' && hasVotedDistrital);
+              
+              return (
+                <CandidateCard
+                  key={candidate.id}
+                  id={candidate.id}
+                  name={candidate.name}
+                  party={candidate.party}
+                  description={candidate.description}
+                  proposals={candidate.proposals}
+                  photo={candidate.photo}
+                  education={candidate.education}
+                  experience={candidate.experience}
+                  onVote={() => handleVoteClick(candidate.id, candidate.name, candidate.party, candidate.photo)}
+                  disabled={isVoted}
+                />
+              );
+            })}
           </div>
 
           {/* Información de seguridad */}

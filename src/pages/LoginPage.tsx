@@ -2,24 +2,49 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@electoral.gov');
+  const [email, setEmail] = useState('admin@grupo3.com');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulación de login
-    setTimeout(() => {
-      if (email && password) {
-        navigate('/admin/dashboard');
+    setError(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          correo: email,
+          contrasena: password
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        const message = data.detail || 'Credenciales inválidas';
+        setError(message);
+        setIsLoading(false);
+        return;
       }
+
+      // Si el backend responde OK, guardamos el usuario y navegamos
+      const data = await response.json();
+      localStorage.setItem('admin_user', JSON.stringify(data));
+      navigate('/admin/dashboard');
+    } catch (err) {
+      console.error('Error en login:', err);
+      setError('No se pudo conectar al servidor de autenticación.');
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleGoBack = () => {
@@ -58,7 +83,12 @@ export default function LoginPage() {
             </div>
 
             {/* Formulario */}
-            <div className="px-8 py-6 bg-gray-800">
+            <div className="px-8 py-6 bg-gray-800 space-y-4">
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/30 text-red-200 text-sm px-4 py-3 rounded-lg">
+                  {error}
+                </div>
+              )}
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Campo Email */}
                 <div>
