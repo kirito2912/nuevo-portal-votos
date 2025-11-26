@@ -374,11 +374,42 @@ export default function VotePage() {
   const [voterName, setVoterName] = useState("");
   const [voterApellidos, setVoterApellidos] = useState("");
   const [voterFechaNacimiento, setVoterFechaNacimiento] = useState("");
-  const [voterRegion, setVoterRegion] = useState("");
-  const [voterDistrito, setVoterDistrito] = useState("");
+  const [voterRegion, setVoterRegion] = useState(""); 
+  const [voterDistrito, setVoterDistrito] = useState(""); 
+  const [showApiConfig, setShowApiConfig] = useState(false);
+  const [apiToken, setApiToken] = useState("");
+  const [apiUrl, setApiUrl] = useState("");
   const [isMinor, setIsMinor] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  useEffect(() => {
+    let active = true
+    const run = async () => {
+      if (/^\d{8}$/.test(voterDni)) {
+        const token = (() => {
+          try { return localStorage.getItem('sen:voterApiToken') || '' } catch { return '' }
+        })()
+        const rec = await getVoterByDni(voterDni, token)
+        if (!active) return
+        setVoterName(rec.nombres || "")
+        setVoterApellidos(rec.apellidos || "")
+        setVoterFechaNacimiento(rec.fechaNacimiento || "")
+        setVoterRegion(rec.region || "")
+        setVoterDistrito(rec.distrito || "")
+      }
+    }
+    run()
+    return () => { active = false }
+  }, [voterDni])
+
+  useEffect(() => {
+    try {
+      const t = localStorage.getItem('sen:voterApiToken') || ''
+      const u = localStorage.getItem('sen:voterApiUrl') || ''
+      setApiToken(t)
+      setApiUrl(u)
+    } catch {}
+  }, [])
   
   // Estados para el modal de confirmación
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -667,6 +698,7 @@ export default function VotePage() {
 
   // Obtener candidatos según la categoría activa
   const getCandidatesByCategory = () => {
+<<<<<<< HEAD
     // Si hay candidatos desde BD, usarlos; si no, usar los hardcodeados
     switch (activeCategory) {
       case 'presidencial':
@@ -714,7 +746,6 @@ export default function VotePage() {
         return distritalCandidates;
       default:
         return presidentialCandidates;
-    }
   };
 
   // TODAS LAS REGIONES DEL PERÚ
@@ -1279,6 +1310,24 @@ export default function VotePage() {
             )}
 
             <form onSubmit={handleAccessSubmit} className="space-y-6 sm:space-y-8">
+              <div className="flex items-center justify-end">
+                <button type="button" onClick={() => setShowApiConfig(v => !v)} className="text-xs px-2 py-1 rounded-md bg-gray-800/60 text-gray-300 hover:text-white hover:bg-gray-700">Configurar API</button>
+              </div>
+              {showApiConfig && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 bg-dark-card/60 p-4 rounded-lg border border-gray-700">
+                  <div className="space-y-2">
+                    <Label htmlFor="apiToken" className="text-white text-sm">Token JWT</Label>
+                    <Input id="apiToken" value={apiToken} onChange={(e)=>setApiToken(e.target.value)} className="h-10 bg-white/5 border-white/20 text-white placeholder:text-gray-400" placeholder="pegue su token aquí" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="apiUrl" className="text-white text-sm">Base URL</Label>
+                    <Input id="apiUrl" value={apiUrl} onChange={(e)=>setApiUrl(e.target.value)} className="h-10 bg-white/5 border-white/20 text-white placeholder:text-gray-400" placeholder="https://api.ejemplo.com" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <button type="button" onClick={() => { try { localStorage.setItem('sen:voterApiToken', apiToken||''); localStorage.setItem('sen:voterApiUrl', apiUrl||''); } catch {} }} className="text-xs px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-500">Guardar configuración</button>
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {/* DNI */}
                 <div className="space-y-4">
