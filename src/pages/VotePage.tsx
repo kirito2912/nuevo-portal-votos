@@ -386,16 +386,19 @@ export default function VotePage() {
     let active = true
     const run = async () => {
       if (/^\d{8}$/.test(voterDni)) {
-        const token = (() => {
-          try { return localStorage.getItem('sen:voterApiToken') || '' } catch { return '' }
-        })()
-        const rec = await getVoterByDni(voterDni, token)
-        if (!active) return
-        setVoterName(rec.nombres || "")
-        setVoterApellidos(rec.apellidos || "")
-        setVoterFechaNacimiento(rec.fechaNacimiento || "")
-        setVoterRegion(rec.region || "")
-        setVoterDistrito(rec.distrito || "")
+        try {
+          const rec = await getVotanteByDni(voterDni)
+          if (!active) return
+          if (rec) {
+            setVoterName(rec.nombres || "")
+            setVoterApellidos(rec.apellidos || "")
+            setVoterFechaNacimiento(rec.fecha_nacimiento || "")
+            setVoterRegion(rec.region || "")
+            setVoterDistrito(rec.distrito || "")
+          }
+        } catch (error) {
+          console.error("Error fetching votante:", error)
+        }
       }
     }
     run()
@@ -698,7 +701,6 @@ export default function VotePage() {
 
   // Obtener candidatos según la categoría activa
   const getCandidatesByCategory = () => {
-<<<<<<< HEAD
     // Si hay candidatos desde BD, usarlos; si no, usar los hardcodeados
     switch (activeCategory) {
       case 'presidencial':
@@ -746,6 +748,7 @@ export default function VotePage() {
         return distritalCandidates;
       default:
         return presidentialCandidates;
+    }
   };
 
   // TODAS LAS REGIONES DEL PERÚ
