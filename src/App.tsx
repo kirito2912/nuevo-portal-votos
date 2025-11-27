@@ -4,8 +4,9 @@ import HomePage from './pages/HomePage';
 import VotePage from './pages/VotePage';
 import ResultsPage from './pages/ResultsPage';
 import AboutPage from './pages/AboutPage';
-import LoginPage from './admin/pages/LoginPage';
+import LoginPage from './pages/LoginPage';
 import DashboardPage from './admin/pages/DashboardPage';
+import ProtectedRoute from './admin/ProtectedRoute';
 
 function App() {
   return (
@@ -22,8 +23,8 @@ function App() {
         {/* Ruta de Admin Login sin Layout */}
         <Route path="/admin/login" element={<LoginPage />} />
 
-        {/* Ruta de Admin Dashboard con AdminLayout */}
-        <Route path="/admin/dashboard" element={<DashboardPage />} />
+        {/* Ruta de Admin Dashboard con protección */}
+        <Route path="/admin/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

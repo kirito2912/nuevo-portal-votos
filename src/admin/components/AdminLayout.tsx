@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import AdminHeader from './AdminHeader';
+import AdminSidebar from './AdminSidebar';
 import '../../styles/admin/index.css';
 
 interface AdminLayoutProps {
@@ -10,9 +11,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="admin-layout">
       <AdminHeader />
-      <main className="admin-main-content">
-        {children}
-      </main>
+      <div className="flex">
+        <AdminSidebar />
+        <main className="flex-1 admin-main-content">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
