@@ -23,7 +23,9 @@ cp .env.example .env
 
 ```bash
 uvicorn main:app --reload --port 8000
+python -m uvicorn main:app --reload --port 8000
 ```
+
 
 El servidor estará disponible en `http://localhost:8000`
 

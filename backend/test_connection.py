@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB_SERVER = os.getenv("DB_SERVER", "DESKTOP-9HF4IO3\\PC")
+DB_SERVER = os.getenv("DB_SERVER", "localhost")
 DB_DATABASE = os.getenv("DB_DATABASE", "SISTEMA_ELECTORAL")
 DB_DRIVER = os.getenv("DB_DRIVER", "ODBC Driver 17 for SQL Server")
 DB_TRUSTED_CONNECTION = os.getenv("DB_TRUSTED_CONNECTION", "true").lower() == "true"

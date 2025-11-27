@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { login } from '@/admin/auth';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -29,7 +30,7 @@ export default function LoginPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        const message = data.detail || 'Credenciales inválidas';
+        const message = data.detail || `Error ${response.status}: ${response.statusText}`;
         setError(message);
         setIsLoading(false);
         return;
@@ -37,11 +38,17 @@ export default function LoginPage() {
 
       // Si el backend responde OK, guardamos el usuario y navegamos
       const data = await response.json();
+      // Guardar en ambas claves para compatibilidad
       localStorage.setItem('admin_user', JSON.stringify(data));
+      login({ email: data.correo });
       navigate('/admin/dashboard');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error en login:', err);
-      setError('No se pudo conectar al servidor de autenticación.');
+      if (err.message && err.message.includes('Failed to fetch')) {
+        setError('No se pudo conectar al servidor. Asegúrate de que el backend esté corriendo en http://localhost:8000');
+      } else {
+        setError(`Error de conexión: ${err.message || 'Error desconocido'}`);
+      }
     } finally {
       setIsLoading(false);
     }

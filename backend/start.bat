@@ -4,20 +4,24 @@ echo   Iniciando Backend Sistema Electoral
 echo ====================================
 echo.
 
-REM Verificar si existe el archivo .env
+REM Verificar si existe el archivo .env o config.env
 if not exist .env (
-    echo [ERROR] No se encontro el archivo .env
-    echo Por favor crea el archivo .env con las credenciales de SQL Server
-    echo.
-    echo Ejemplo:
-    echo DB_SERVER=localhost
-    echo DB_DATABASE=SISTEMA_ELECTORAL
-    echo DB_USER=sa
-    echo DB_PASSWORD=tu_contraseña
-    echo DB_DRIVER=ODBC Driver 17 for SQL Server
-    echo.
-    pause
-    exit /b 1
+    if not exist config.env (
+        echo [ERROR] No se encontro el archivo .env ni config.env
+        echo Por favor crea el archivo .env con las credenciales de SQL Server
+        echo.
+        echo Ejemplo:
+        echo DB_SERVER=localhost
+        echo DB_DATABASE=SISTEMA_ELECTORAL
+        echo DB_USER=
+        echo DB_PASSWORD=
+        echo DB_DRIVER=ODBC Driver 17 for SQL Server
+        echo DB_TRUSTED_CONNECTION=true
+        echo.
+        pause
+        exit /b 1
+    )
+    echo Usando config.env como archivo de configuracion
 )
 
 echo Verificando dependencias...

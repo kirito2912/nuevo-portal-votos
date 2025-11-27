@@ -41,6 +41,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.get("/")
+async def root():
+    """Endpoint básico para la raíz del backend"""
+    return {
+        "message": "API del Sistema Electoral activa",
+        "docs": "/docs",
+        "redoc": "/redoc",
+        "version": app.version,
+    }
+
 # Configuración de conexión a SQL Server
 DB_SERVER = os.getenv("DB_SERVER", "DESKTOP-9HF4IO3\\PC")
 DB_DATABASE = os.getenv("DB_DATABASE", "SISTEMA_ELECTORAL")
