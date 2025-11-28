@@ -63,11 +63,20 @@ export const getDniInfoFromFactiliza = async (dni: string, token?: string): Prom
   try {
     const authToken = token || FACTILIZA_TOKEN;
     
+    console.log('🔑 Token disponible:', authToken ? 'Sí' : 'No');
+    
     if (!authToken) {
-      throw new Error('Token de Factiliza no configurado');
+      console.error('❌ Token de Factiliza no configurado');
+      return {
+        success: false,
+        message: 'Token de Factiliza no configurado'
+      };
     }
 
-    const response = await fetch(`${FACTILIZA_API_URL}/${dni}`, {
+    const url = `${FACTILIZA_API_URL}/${dni}`;
+    console.log('🌐 Consultando URL:', url);
+
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${authToken}`,
@@ -75,23 +84,30 @@ export const getDniInfoFromFactiliza = async (dni: string, token?: string): Prom
       }
     });
     
+    console.log('📡 Status de respuesta:', response.status);
+    
     if (!response.ok) {
       if (response.status === 404) {
+        console.warn('⚠️ DNI no encontrado (404)');
         return {
           success: false,
           message: 'DNI no encontrado'
         };
       }
+      const errorText = await response.text();
+      console.error('❌ Error en respuesta:', errorText);
       throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
     
     const data = await response.json();
+    console.log('✅ Datos recibidos:', data);
+    
     return {
       success: true,
       data: data
     };
   } catch (error) {
-    console.error('Error fetching DNI from Factiliza:', error);
+    console.error('❌ Error fetching DNI from Factiliza:', error);
     return {
       success: false,
       message: error instanceof Error ? error.message : 'Error desconocido'

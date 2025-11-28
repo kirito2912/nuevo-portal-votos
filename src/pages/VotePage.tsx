@@ -391,6 +391,8 @@ export default function VotePage() {
     const run = async () => {
       if (/^\d{8}$/.test(voterDni)) {
         setLoadingDniInfo(true);
+        console.log("🔍 Buscando DNI:", voterDni);
+        
         try {
           // Primero intentar obtener desde la BD local
           const rec = await getVotanteByDni(voterDni)
@@ -398,6 +400,7 @@ export default function VotePage() {
           
           if (rec) {
             // Si existe en BD, usar esos datos
+            console.log("✅ Votante encontrado en BD:", rec);
             setVoterName(rec.nombres || "")
             setVoterApellidos(rec.apellidos || "")
             setVoterFechaNacimiento(rec.fecha_nacimiento || "")
@@ -405,28 +408,53 @@ export default function VotePage() {
             setVoterDistrito(rec.distrito || "")
           } else {
             // Si no existe, consultar Factiliza
+            console.log("🌐 Consultando Factiliza...");
             const token = localStorage.getItem('sen:factilizaToken') || '';
+            
+            if (!token) {
+              console.warn("⚠️ Token de Factiliza no configurado. Configure el token en la interfaz.");
+              setLoadingDniInfo(false);
+              return;
+            }
+            
             const factilizaResponse = await getDniInfoFromFactiliza(voterDni, token);
+            console.log("📡 Respuesta de Factiliza:", factilizaResponse);
             
             if (!active) return
             
             if (factilizaResponse.success && factilizaResponse.data) {
               const data = factilizaResponse.data;
-              setVoterName(data.nombres || "")
-              setVoterApellidos(`${data.apellido_paterno || ""} ${data.apellido_materno || ""}`.trim())
-              setVoterFechaNacimiento(data.fecha_nacimiento || "")
-              // Región y distrito deben ser ingresados manualmente
+              console.log("✅ Datos recibidos de Factiliza:", data);
+              
+              const nombres = data.nombres || "";
+              const apellidos = `${data.apellido_paterno || ""} ${data.apellido_materno || ""}`.trim();
+              const fechaNacimiento = data.fecha_nacimiento || "";
+              
+              console.log("📝 Llenando campos:", { nombres, apellidos, fechaNacimiento });
+              
+              setVoterName(nombres)
+              setVoterApellidos(apellidos)
+              setVoterFechaNacimiento(fechaNacimiento)
+              
+              console.log("✅ Campos actualizados");
             } else {
-              console.log("DNI no encontrado en Factiliza:", factilizaResponse.message)
+              console.warn("❌ DNI no encontrado en Factiliza:", factilizaResponse.message)
+              setError(factilizaResponse.message || "No se encontró información del DNI")
             }
           }
         } catch (error) {
-          console.error("Error fetching votante:", error)
+          console.error("❌ Error fetching votante:", error)
+          setError("Error al consultar información del DNI")
         } finally {
           if (active) {
             setLoadingDniInfo(false);
           }
         }
+      } else if (voterDni.length > 0) {
+        // Limpiar campos si el DNI no es válido
+        setVoterName("")
+        setVoterApellidos("")
+        setVoterFechaNacimiento("")
       }
     }
     run()
