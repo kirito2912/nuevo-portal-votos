@@ -446,30 +446,35 @@ export default function VotePage() {
             fechaNacimiento 
           });
           
-          // Actualizar estados de forma inmediata
-          console.log("🔄 Actualizando nombre:", nombres);
+          // Actualizar estados
+          console.log("🔄 Actualizando estados...");
           setVoterName(nombres);
-          
-          console.log("🔄 Actualizando apellidos:", apellidos);
           setVoterApellidos(apellidos);
-          
-          console.log("🔄 Actualizando fecha:", fechaNacimiento);
           setVoterFechaNacimiento(fechaNacimiento);
           
-          console.log("✅ Campos actualizados exitosamente");
-          
-          // Verificar después de actualizar
-          requestAnimationFrame(() => {
+          // FORZAR actualización del DOM directamente
+          setTimeout(() => {
             const nombreInput = document.getElementById('nombre') as HTMLInputElement;
             const apellidosInput = document.getElementById('apellidos') as HTMLInputElement;
             const fechaInput = document.getElementById('fechaNacimiento') as HTMLInputElement;
             
-            console.log("🔍 Verificando valores en el siguiente frame:", {
-              nombre: nombreInput?.value,
-              apellidos: apellidosInput?.value,
-              fecha: fechaInput?.value
-            });
-          });
+            if (nombreInput && nombres) {
+              nombreInput.value = nombres;
+              console.log("✅ Nombre actualizado en DOM:", nombres);
+            }
+            
+            if (apellidosInput && apellidos) {
+              apellidosInput.value = apellidos;
+              console.log("✅ Apellidos actualizados en DOM:", apellidos);
+            }
+            
+            if (fechaInput && fechaNacimiento) {
+              fechaInput.value = fechaNacimiento;
+              console.log("✅ Fecha actualizada en DOM:", fechaNacimiento);
+            }
+            
+            console.log("✅ Todos los campos actualizados");
+          }, 100);
         } else {
           console.warn("❌ No se encontró información:", factilizaResponse.message);
           setError(factilizaResponse.message || "No se encontró información del DNI");
