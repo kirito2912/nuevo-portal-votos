@@ -1519,19 +1519,18 @@ export default function VotePage() {
                   <Label className="text-gray-800 font-semibold text-sm">
                     Nombres *
                   </Label>
-                  <Input
+                  <input
                     ref={nombreInputRef}
                     id="nombre"
                     name="nombre"
                     type="text"
-                    defaultValue={voterName}
                     onChange={(e) => {
                       console.log("📝 Cambiando nombre a:", e.target.value);
                       setVoterName(e.target.value);
                     }}
                     placeholder="Juan Carlos"
                     required
-                    className="h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
+                    className="h-9 w-full rounded-md bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm px-3"
                   />
                   {voterName && <p className="text-xs text-green-600">✓ Valor actual: {voterName}</p>}
                 </div>
@@ -1541,19 +1540,18 @@ export default function VotePage() {
                   <Label className="text-gray-800 font-semibold text-sm">
                     Apellidos Completos *
                   </Label>
-                  <Input
+                  <input
                     ref={apellidosInputRef}
                     id="apellidos"
                     name="apellidos"
                     type="text"
-                    defaultValue={voterApellidos}
                     onChange={(e) => {
                       console.log("📝 Cambiando apellidos a:", e.target.value);
                       setVoterApellidos(e.target.value);
                     }}
                     placeholder="Pérez García"
                     required
-                    className="h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
+                    className="h-9 w-full rounded-md bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm px-3"
                   />
                   {voterApellidos && <p className="text-xs text-green-600">✓ Valor actual: {voterApellidos}</p>}
                 </div>
@@ -1565,19 +1563,18 @@ export default function VotePage() {
                   </Label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-                    <Input
+                    <input
                       ref={fechaInputRef}
                       id="fechaNacimiento"
                       name="fechaNacimiento"
                       type="date"
-                      defaultValue={voterFechaNacimiento}
                       onChange={(e) => {
                         console.log("📝 Cambiando fecha a:", e.target.value);
                         handleFechaNacimientoChange(e.target.value);
                       }}
                       required
                       max={new Date().toISOString().split('T')[0]}
-                      className="pl-10 h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
+                      className="pl-10 h-9 w-full rounded-md bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
                     />
                   </div>
                   {voterFechaNacimiento && <p className="text-xs text-green-600">✓ Fecha: {voterFechaNacimiento}</p>}
