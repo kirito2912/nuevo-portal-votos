@@ -1400,7 +1400,6 @@ export default function VotePage() {
                     Nombres *
                   </Label>
                   <Input
-                    key={`nombre-${voterDni}`}
                     id="nombre"
                     type="text"
                     value={voterName}
@@ -1421,7 +1420,6 @@ export default function VotePage() {
                     Apellidos Completos *
                   </Label>
                   <Input
-                    key={`apellidos-${voterDni}`}
                     id="apellidos"
                     type="text"
                     value={voterApellidos}
@@ -1444,7 +1442,6 @@ export default function VotePage() {
                   <div className="relative">
                     <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
                     <Input
-                      key={`fecha-${voterDni}`}
                       id="fechaNacimiento"
                       type="date"
                       value={voterFechaNacimiento}
