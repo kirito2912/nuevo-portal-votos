@@ -18,6 +18,7 @@ import {
   createVotoPresidencial,
   createVotoRegional,
   createVotoDistrital,
+  getDniInfoFromFactiliza,
   type Candidato
 } from "@/services/voteService";
 
@@ -377,27 +378,54 @@ export default function VotePage() {
   const [voterFechaNacimiento, setVoterFechaNacimiento] = useState("");
   const [voterRegion, setVoterRegion] = useState(""); 
   const [voterDistrito, setVoterDistrito] = useState(""); 
-  const [, setApiToken] = useState("");
-  const [, setApiUrl] = useState("");
+  const [factilizaToken, setFactilizaToken] = useState("");
+  const [showTokenConfig, setShowTokenConfig] = useState(false);
   const [isMinor, setIsMinor] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [loadingDniInfo, setLoadingDniInfo] = useState(false);
+  
+  // Autocompletar datos desde Factiliza cuando se ingresa DNI
   useEffect(() => {
     let active = true
     const run = async () => {
       if (/^\d{8}$/.test(voterDni)) {
+        setLoadingDniInfo(true);
         try {
+          // Primero intentar obtener desde la BD local
           const rec = await getVotanteByDni(voterDni)
           if (!active) return
+          
           if (rec) {
+            // Si existe en BD, usar esos datos
             setVoterName(rec.nombres || "")
             setVoterApellidos(rec.apellidos || "")
             setVoterFechaNacimiento(rec.fecha_nacimiento || "")
             setVoterRegion(rec.region || "")
             setVoterDistrito(rec.distrito || "")
+          } else {
+            // Si no existe, consultar Factiliza
+            const token = localStorage.getItem('sen:factilizaToken') || '';
+            const factilizaResponse = await getDniInfoFromFactiliza(voterDni, token);
+            
+            if (!active) return
+            
+            if (factilizaResponse.success && factilizaResponse.data) {
+              const data = factilizaResponse.data;
+              setVoterName(data.nombres || "")
+              setVoterApellidos(`${data.apellido_paterno || ""} ${data.apellido_materno || ""}`.trim())
+              setVoterFechaNacimiento(data.fecha_nacimiento || "")
+              // Región y distrito deben ser ingresados manualmente
+            } else {
+              console.log("DNI no encontrado en Factiliza:", factilizaResponse.message)
+            }
           }
         } catch (error) {
           console.error("Error fetching votante:", error)
+        } finally {
+          if (active) {
+            setLoadingDniInfo(false);
+          }
         }
       }
     }
@@ -405,14 +433,24 @@ export default function VotePage() {
     return () => { active = false }
   }, [voterDni])
 
+  // Cargar token de Factiliza desde localStorage
   useEffect(() => {
     try {
-      const t = localStorage.getItem('sen:voterApiToken') || ''
-      const u = localStorage.getItem('sen:voterApiUrl') || ''
-      setApiToken(t)
-      setApiUrl(u)
+      const token = localStorage.getItem('sen:factilizaToken') || ''
+      setFactilizaToken(token)
     } catch {}
   }, [])
+  
+  // Guardar token de Factiliza
+  const saveFactilizaToken = () => {
+    try {
+      localStorage.setItem('sen:factilizaToken', factilizaToken)
+      setShowTokenConfig(false)
+      alert('Token guardado correctamente')
+    } catch (error) {
+      alert('Error al guardar el token')
+    }
+  }
   
   // Estados para el modal de confirmación
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -1291,9 +1329,17 @@ export default function VotePage() {
                       placeholder="12345678"
                       maxLength={8}
                       required
-                      className="pl-10 h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
+                      className="pl-10 pr-10 h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
                     />
+                    {loadingDniInfo && (
+                      <div className="absolute right-3 top-2.5">
+                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
                   </div>
+                  {loadingDniInfo && (
+                    <p className="text-xs text-blue-600">Consultando información del DNI...</p>
+                  )}
                 </div>
 
                 {/* Nombres */}
@@ -1435,10 +1481,75 @@ export default function VotePage() {
               <p className="text-gray-600 text-xs">
                 🔒 Sus datos están protegidos 
               </p>
+              <button
+                type="button"
+                onClick={() => setShowTokenConfig(true)}
+                className="text-blue-600 hover:text-blue-700 text-xs mt-2 underline"
+              >
+                Configurar API Factiliza
+              </button>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal de configuración de token Factiliza */}
+      {showTokenConfig && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full mx-auto shadow-2xl">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
+              <h2 className="text-xl font-bold">Configurar API Factiliza</h2>
+              <p className="text-blue-100 text-sm mt-1">
+                Ingrese su token para autocompletar datos del DNI
+              </p>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <Label htmlFor="factilizaToken" className="text-gray-700 font-semibold">
+                  Token de API
+                </Label>
+                <Input
+                  id="factilizaToken"
+                  type="password"
+                  value={factilizaToken}
+                  onChange={(e) => setFactilizaToken(e.target.value)}
+                  placeholder="Ingrese su token de Factiliza"
+                  className="mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Obtén tu token en{' '}
+                  <a 
+                    href="https://factiliza.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    factiliza.com
+                  </a>
+                </p>
+              </div>
+              
+              <div className="flex gap-3 pt-2">
+                <Button
+                  type="button"
+                  onClick={() => setShowTokenConfig(false)}
+                  className="flex-1 bg-gray-500 hover:bg-gray-600"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="button"
+                  onClick={saveFactilizaToken}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  Guardar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

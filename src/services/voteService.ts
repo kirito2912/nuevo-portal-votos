@@ -3,6 +3,8 @@
  */
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const FACTILIZA_API_URL = 'https://api.factiliza.com/v1/dni/info';
+const FACTILIZA_TOKEN = import.meta.env.VITE_FACTILIZA_TOKEN || '';
 
 export interface Votante {
   id_votantes: number;
@@ -38,6 +40,64 @@ export interface VotanteStatus {
   can_vote_distrital: boolean;
   has_all_votes: boolean;
 }
+
+export interface FactilizaDniResponse {
+  success: boolean;
+  data?: {
+    numero: string;
+    nombre_completo: string;
+    nombres: string;
+    apellido_paterno: string;
+    apellido_materno: string;
+    fecha_nacimiento?: string;
+    ubigeo?: string;
+    direccion?: string;
+  };
+  message?: string;
+}
+
+/**
+ * Obtiene información de un DNI desde la API de Factiliza
+ */
+export const getDniInfoFromFactiliza = async (dni: string, token?: string): Promise<FactilizaDniResponse> => {
+  try {
+    const authToken = token || FACTILIZA_TOKEN;
+    
+    if (!authToken) {
+      throw new Error('Token de Factiliza no configurado');
+    }
+
+    const response = await fetch(`${FACTILIZA_API_URL}/${dni}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        return {
+          success: false,
+          message: 'DNI no encontrado'
+        };
+      }
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return {
+      success: true,
+      data: data
+    };
+  } catch (error) {
+    console.error('Error fetching DNI from Factiliza:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Error desconocido'
+    };
+  }
+};
 
 /**
  * Registra un nuevo votante
