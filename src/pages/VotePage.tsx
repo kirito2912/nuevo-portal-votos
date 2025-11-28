@@ -1412,8 +1412,9 @@ export default function VotePage() {
                   <Input
                     ref={nombreInputRef}
                     id="nombre"
+                    name="nombre"
                     type="text"
-                    value={voterName}
+                    defaultValue={voterName}
                     onChange={(e) => {
                       console.log("📝 Cambiando nombre a:", e.target.value);
                       setVoterName(e.target.value);
@@ -1433,8 +1434,9 @@ export default function VotePage() {
                   <Input
                     ref={apellidosInputRef}
                     id="apellidos"
+                    name="apellidos"
                     type="text"
-                    value={voterApellidos}
+                    defaultValue={voterApellidos}
                     onChange={(e) => {
                       console.log("📝 Cambiando apellidos a:", e.target.value);
                       setVoterApellidos(e.target.value);
@@ -1456,8 +1458,9 @@ export default function VotePage() {
                     <Input
                       ref={fechaInputRef}
                       id="fechaNacimiento"
+                      name="fechaNacimiento"
                       type="date"
-                      value={voterFechaNacimiento}
+                      defaultValue={voterFechaNacimiento}
                       onChange={(e) => {
                         console.log("📝 Cambiando fecha a:", e.target.value);
                         handleFechaNacimientoChange(e.target.value);
