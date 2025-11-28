@@ -446,32 +446,30 @@ export default function VotePage() {
             fechaNacimiento 
           });
           
-          // Actualizar estados uno por uno con logs
-          if (nombres) {
-            console.log("🔄 Actualizando nombre:", nombres);
-            setVoterName(nombres);
-          }
+          // Actualizar estados de forma inmediata
+          console.log("🔄 Actualizando nombre:", nombres);
+          setVoterName(nombres);
           
-          if (apellidos) {
-            console.log("🔄 Actualizando apellidos:", apellidos);
-            setVoterApellidos(apellidos);
-          }
+          console.log("🔄 Actualizando apellidos:", apellidos);
+          setVoterApellidos(apellidos);
           
-          if (fechaNacimiento) {
-            console.log("🔄 Actualizando fecha:", fechaNacimiento);
-            setVoterFechaNacimiento(fechaNacimiento);
-          }
-          
-          // Forzar actualización después de un pequeño delay
-          setTimeout(() => {
-            console.log("🔍 Verificando valores actuales:", {
-              voterName,
-              voterApellidos,
-              voterFechaNacimiento
-            });
-          }, 100);
+          console.log("🔄 Actualizando fecha:", fechaNacimiento);
+          setVoterFechaNacimiento(fechaNacimiento);
           
           console.log("✅ Campos actualizados exitosamente");
+          
+          // Verificar después de actualizar
+          requestAnimationFrame(() => {
+            const nombreInput = document.getElementById('nombre') as HTMLInputElement;
+            const apellidosInput = document.getElementById('apellidos') as HTMLInputElement;
+            const fechaInput = document.getElementById('fechaNacimiento') as HTMLInputElement;
+            
+            console.log("🔍 Verificando valores en el siguiente frame:", {
+              nombre: nombreInput?.value,
+              apellidos: apellidosInput?.value,
+              fecha: fechaInput?.value
+            });
+          });
         } else {
           console.warn("❌ No se encontró información:", factilizaResponse.message);
           setError(factilizaResponse.message || "No se encontró información del DNI");
@@ -1371,7 +1369,7 @@ export default function VotePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* DNI */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="dni" className="text-gray-800 font-semibold text-sm">
+                  <Label className="text-gray-800 font-semibold text-sm">
                     Número de DNI *
                   </Label>
                   <div className="relative">
@@ -1470,7 +1468,7 @@ export default function VotePage() {
 
                 {/* Región */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="region" className="text-gray-800 font-semibold text-sm">
+                  <Label className="text-gray-800 font-semibold text-sm">
                     Región *
                   </Label>
                   <div className="relative">
@@ -1502,7 +1500,7 @@ export default function VotePage() {
 
                 {/* Distrito */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="distrito" className="text-gray-800 font-semibold text-sm">
+                  <Label className="text-gray-800 font-semibold text-sm">
                     Distrito de Residencia *
                   </Label>
                   <Select 
@@ -1577,7 +1575,7 @@ export default function VotePage() {
             
             <div className="p-6 space-y-4">
               <div>
-                <Label htmlFor="factilizaToken" className="text-gray-700 font-semibold">
+                <Label className="text-gray-700 font-semibold">
                   Token de API
                 </Label>
                 <Input
