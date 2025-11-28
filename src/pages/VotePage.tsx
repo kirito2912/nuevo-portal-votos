@@ -401,6 +401,11 @@ export default function VotePage() {
       setLoadingDniInfo(true);
       setError("");
       console.log("🔍 Buscando DNI:", voterDni);
+      console.log("🔍 Estado de refs:", {
+        nombreRef: nombreInputRef.current ? "✅ Existe" : "❌ NULL",
+        apellidosRef: apellidosInputRef.current ? "✅ Existe" : "❌ NULL",
+        fechaRef: fechaInputRef.current ? "✅ Existe" : "❌ NULL"
+      });
       
       try {
         // Primero intentar obtener desde la BD local
