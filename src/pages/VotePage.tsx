@@ -1,6 +1,6 @@
 // VotePage.tsx - Sistema Electoral Nacional
 // Última actualización: 2025-11-27
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -385,6 +385,11 @@ export default function VotePage() {
   const [error, setError] = useState("");
   const [loadingDniInfo, setLoadingDniInfo] = useState(false);
   
+  // Refs para acceso directo a los inputs
+  const nombreInputRef = useRef<HTMLInputElement>(null);
+  const apellidosInputRef = useRef<HTMLInputElement>(null);
+  const fechaInputRef = useRef<HTMLInputElement>(null);
+  
   // Autocompletar datos desde Factiliza cuando se ingresa DNI
   useEffect(() => {
     const fetchDniData = async () => {
@@ -446,43 +451,35 @@ export default function VotePage() {
             fechaNacimiento 
           });
           
-          // SOLUCIÓN DEFINITIVA: Actualizar estados Y DOM directamente
-          console.log("🔄 Iniciando actualización...");
+          // SOLUCIÓN CON REFS: Actualizar estados Y DOM usando refs
+          console.log("🔄 Actualizando con datos:", { nombres, apellidos, fechaNacimiento });
           
-          // Actualizar estados de React
+          // Actualizar estados de React primero
           setVoterName(nombres);
           setVoterApellidos(apellidos);
           setVoterFechaNacimiento(fechaNacimiento);
           
-          // FORZAR actualización del DOM Y disparar eventos
+          console.log("✅ Estados actualizados, ahora forzando DOM...");
+          
+          // Forzar actualización del DOM usando refs
           setTimeout(() => {
-            const nombreInput = document.getElementById('nombre') as HTMLInputElement;
-            const apellidosInput = document.getElementById('apellidos') as HTMLInputElement;
-            const fechaInput = document.getElementById('fechaNacimiento') as HTMLInputElement;
-            
-            if (nombreInput && nombres) {
-              nombreInput.value = nombres;
-              nombreInput.dispatchEvent(new Event('input', { bubbles: true }));
-              nombreInput.dispatchEvent(new Event('change', { bubbles: true }));
-              console.log("✅ Nombre actualizado:", nombres);
+            if (nombreInputRef.current && nombres) {
+              nombreInputRef.current.value = nombres;
+              console.log("✅ Nombre actualizado en input:", nombres);
             }
             
-            if (apellidosInput && apellidos) {
-              apellidosInput.value = apellidos;
-              apellidosInput.dispatchEvent(new Event('input', { bubbles: true }));
-              apellidosInput.dispatchEvent(new Event('change', { bubbles: true }));
-              console.log("✅ Apellidos actualizados:", apellidos);
+            if (apellidosInputRef.current && apellidos) {
+              apellidosInputRef.current.value = apellidos;
+              console.log("✅ Apellidos actualizados en input:", apellidos);
             }
             
-            if (fechaInput && fechaNacimiento) {
-              fechaInput.value = fechaNacimiento;
-              fechaInput.dispatchEvent(new Event('input', { bubbles: true }));
-              fechaInput.dispatchEvent(new Event('change', { bubbles: true }));
-              console.log("✅ Fecha actualizada:", fechaNacimiento);
+            if (fechaInputRef.current && fechaNacimiento) {
+              fechaInputRef.current.value = fechaNacimiento;
+              console.log("✅ Fecha actualizada en input:", fechaNacimiento);
             }
             
-            console.log("✅ TODOS LOS CAMPOS ACTUALIZADOS EXITOSAMENTE");
-          }, 200);
+            console.log("✅ TODOS LOS CAMPOS ACTUALIZADOS");
+          }, 100);
         } else {
           console.warn("❌ No se encontró información:", factilizaResponse.message);
           setError(factilizaResponse.message || "No se encontró información del DNI");
@@ -1413,6 +1410,7 @@ export default function VotePage() {
                     Nombres *
                   </Label>
                   <Input
+                    ref={nombreInputRef}
                     id="nombre"
                     type="text"
                     value={voterName}
@@ -1433,6 +1431,7 @@ export default function VotePage() {
                     Apellidos Completos *
                   </Label>
                   <Input
+                    ref={apellidosInputRef}
                     id="apellidos"
                     type="text"
                     value={voterApellidos}
@@ -1455,6 +1454,7 @@ export default function VotePage() {
                   <div className="relative">
                     <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
                     <Input
+                      ref={fechaInputRef}
                       id="fechaNacimiento"
                       type="date"
                       value={voterFechaNacimiento}
