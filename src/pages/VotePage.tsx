@@ -451,35 +451,52 @@ export default function VotePage() {
             fechaNacimiento 
           });
           
-          // SOLUCIÓN CON REFS: Actualizar estados Y DOM usando refs
-          console.log("🔄 Actualizando con datos:", { nombres, apellidos, fechaNacimiento });
+          // ACTUALIZACIÓN INMEDIATA Y MÚLTIPLE
+          console.log("🔄 INICIANDO ACTUALIZACIÓN INMEDIATA");
+          console.log("📦 Datos a aplicar:", { nombres, apellidos, fechaNacimiento });
           
-          // Actualizar estados de React primero
+          // 1. Actualizar estados
           setVoterName(nombres);
           setVoterApellidos(apellidos);
           setVoterFechaNacimiento(fechaNacimiento);
           
-          console.log("✅ Estados actualizados, ahora forzando DOM...");
+          // 2. Actualizar DOM INMEDIATAMENTE
+          if (nombreInputRef.current) {
+            nombreInputRef.current.value = nombres;
+            console.log("✅ Nombre actualizado INMEDIATAMENTE:", nombreInputRef.current.value);
+          } else {
+            console.error("❌ nombreInputRef.current es null");
+          }
           
-          // Forzar actualización del DOM usando refs
+          if (apellidosInputRef.current) {
+            apellidosInputRef.current.value = apellidos;
+            console.log("✅ Apellidos actualizados INMEDIATAMENTE:", apellidosInputRef.current.value);
+          } else {
+            console.error("❌ apellidosInputRef.current es null");
+          }
+          
+          if (fechaInputRef.current) {
+            fechaInputRef.current.value = fechaNacimiento;
+            console.log("✅ Fecha actualizada INMEDIATAMENTE:", fechaInputRef.current.value);
+          } else {
+            console.error("❌ fechaInputRef.current es null");
+          }
+          
+          // 3. Actualizar de nuevo después de 50ms por si acaso
           setTimeout(() => {
-            if (nombreInputRef.current && nombres) {
-              nombreInputRef.current.value = nombres;
-              console.log("✅ Nombre actualizado en input:", nombres);
-            }
-            
-            if (apellidosInputRef.current && apellidos) {
-              apellidosInputRef.current.value = apellidos;
-              console.log("✅ Apellidos actualizados en input:", apellidos);
-            }
-            
-            if (fechaInputRef.current && fechaNacimiento) {
-              fechaInputRef.current.value = fechaNacimiento;
-              console.log("✅ Fecha actualizada en input:", fechaNacimiento);
-            }
-            
-            console.log("✅ TODOS LOS CAMPOS ACTUALIZADOS");
-          }, 100);
+            if (nombreInputRef.current) nombreInputRef.current.value = nombres;
+            if (apellidosInputRef.current) apellidosInputRef.current.value = apellidos;
+            if (fechaInputRef.current) fechaInputRef.current.value = fechaNacimiento;
+            console.log("✅ Segunda actualización completada");
+          }, 50);
+          
+          // 4. Actualizar de nuevo después de 200ms
+          setTimeout(() => {
+            if (nombreInputRef.current) nombreInputRef.current.value = nombres;
+            if (apellidosInputRef.current) apellidosInputRef.current.value = apellidos;
+            if (fechaInputRef.current) fechaInputRef.current.value = fechaNacimiento;
+            console.log("✅ Tercera actualización completada");
+          }, 200);
         } else {
           console.warn("❌ No se encontró información:", factilizaResponse.message);
           setError(factilizaResponse.message || "No se encontró información del DNI");
