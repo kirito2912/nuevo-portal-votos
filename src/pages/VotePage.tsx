@@ -1398,7 +1398,7 @@ export default function VotePage() {
 
                 {/* Nombres */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="nombre" className="text-gray-800 font-semibold text-sm">
+                  <Label className="text-gray-800 font-semibold text-sm">
                     Nombres *
                   </Label>
                   <Input
@@ -1419,7 +1419,7 @@ export default function VotePage() {
 
                 {/* Apellidos */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="apellidos" className="text-gray-800 font-semibold text-sm">
+                  <Label className="text-gray-800 font-semibold text-sm">
                     Apellidos Completos *
                   </Label>
                   <Input
@@ -1440,7 +1440,7 @@ export default function VotePage() {
 
                 {/* Fecha de Nacimiento */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="fechaNacimiento" className="text-gray-800 font-semibold text-sm">
+                  <Label className="text-gray-800 font-semibold text-sm">
                     Fecha de Nacimiento *
                   </Label>
                   <div className="relative">
