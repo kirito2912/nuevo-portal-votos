@@ -446,13 +446,15 @@ export default function VotePage() {
             fechaNacimiento 
           });
           
-          // Actualizar estados
-          console.log("🔄 Actualizando estados...");
+          // SOLUCIÓN DEFINITIVA: Actualizar estados Y DOM directamente
+          console.log("🔄 Iniciando actualización...");
+          
+          // Actualizar estados de React
           setVoterName(nombres);
           setVoterApellidos(apellidos);
           setVoterFechaNacimiento(fechaNacimiento);
           
-          // FORZAR actualización del DOM directamente
+          // FORZAR actualización del DOM Y disparar eventos
           setTimeout(() => {
             const nombreInput = document.getElementById('nombre') as HTMLInputElement;
             const apellidosInput = document.getElementById('apellidos') as HTMLInputElement;
@@ -460,21 +462,27 @@ export default function VotePage() {
             
             if (nombreInput && nombres) {
               nombreInput.value = nombres;
-              console.log("✅ Nombre actualizado en DOM:", nombres);
+              nombreInput.dispatchEvent(new Event('input', { bubbles: true }));
+              nombreInput.dispatchEvent(new Event('change', { bubbles: true }));
+              console.log("✅ Nombre actualizado:", nombres);
             }
             
             if (apellidosInput && apellidos) {
               apellidosInput.value = apellidos;
-              console.log("✅ Apellidos actualizados en DOM:", apellidos);
+              apellidosInput.dispatchEvent(new Event('input', { bubbles: true }));
+              apellidosInput.dispatchEvent(new Event('change', { bubbles: true }));
+              console.log("✅ Apellidos actualizados:", apellidos);
             }
             
             if (fechaInput && fechaNacimiento) {
               fechaInput.value = fechaNacimiento;
-              console.log("✅ Fecha actualizada en DOM:", fechaNacimiento);
+              fechaInput.dispatchEvent(new Event('input', { bubbles: true }));
+              fechaInput.dispatchEvent(new Event('change', { bubbles: true }));
+              console.log("✅ Fecha actualizada:", fechaNacimiento);
             }
             
-            console.log("✅ Todos los campos actualizados");
-          }, 100);
+            console.log("✅ TODOS LOS CAMPOS ACTUALIZADOS EXITOSAMENTE");
+          }, 200);
         } else {
           console.warn("❌ No se encontró información:", factilizaResponse.message);
           setError(factilizaResponse.message || "No se encontró información del DNI");
