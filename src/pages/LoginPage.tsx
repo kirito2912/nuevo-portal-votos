@@ -1,25 +1,57 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { login } from '@/admin/auth';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@electoral.gov');
+  const [email, setEmail] = useState('admin@grupo3.com');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulación de login
-    setTimeout(() => {
-      if (email && password) {
-        navigate('/admin/dashboard');
+    setError(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          correo: email,
+          contrasena: password
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        const message = data.detail || `Error ${response.status}: ${response.statusText}`;
+        setError(message);
+        setIsLoading(false);
+        return;
       }
+
+      // Si el backend responde OK, guardamos el usuario y navegamos
+      const data = await response.json();
+      // Guardar en ambas claves para compatibilidad
+      localStorage.setItem('admin_user', JSON.stringify(data));
+      login({ email: data.correo });
+      navigate('/admin/dashboard');
+    } catch (err: any) {
+      console.error('Error en login:', err);
+      if (err.message && err.message.includes('Failed to fetch')) {
+        setError('No se pudo conectar al servidor. Asegúrate de que el backend esté corriendo en http://localhost:8000');
+      } else {
+        setError(`Error de conexión: ${err.message || 'Error desconocido'}`);
+      }
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleGoBack = () => {
