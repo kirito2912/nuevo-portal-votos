@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { login } from '@/admin/auth';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-
 export default function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('admin@grupo3.com');
@@ -18,40 +16,30 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          correo: email,
-          contrasena: password
-        })
-      });
+    // Credenciales hardcodeadas para demo
+    const validCredentials = [
+      { email: 'admin@electoral.gov', password: 'Pipe123' },
+      { email: 'admin@grupo3.com', password: 'Pipe123' }
+    ];
 
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        const message = data.detail || `Error ${response.status}: ${response.statusText}`;
-        setError(message);
-        setIsLoading(false);
-        return;
-      }
+    // Simular delay de autenticación
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Si el backend responde OK, guardamos el usuario y navegamos
-      const data = await response.json();
-      // Guardar en ambas claves para compatibilidad
-      localStorage.setItem('admin_user', JSON.stringify(data));
-      login({ email: data.correo });
+    const isValid = validCredentials.some(
+      cred => cred.email === email && cred.password === password
+    );
+
+    if (isValid) {
+      // Login exitoso
+      const userData = { correo: email, rol: 'admin' };
+      localStorage.setItem('admin_user', JSON.stringify(userData));
+      login({ email: email });
       navigate('/admin/dashboard');
-    } catch (err: any) {
-      console.error('Error en login:', err);
-      if (err.message && err.message.includes('Failed to fetch')) {
-        setError('No se pudo conectar al servidor. Asegúrate de que el backend esté corriendo en http://localhost:8000');
-      } else {
-        setError(`Error de conexión: ${err.message || 'Error desconocido'}`);
-      }
-    } finally {
-      setIsLoading(false);
+    } else {
+      setError('Credenciales incorrectas. Verifica tu email y contraseña.');
     }
+
+    setIsLoading(false);
   };
 
   const handleGoBack = () => {
@@ -138,6 +126,13 @@ export default function LoginPage() {
                     </button>
                   </div>
                 </div>
+
+                {/* Error Message */}
+                {error && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-700 text-sm">{error}</p>
+                  </div>
+                )}
 
                 {/* Botón de Acceso */}
                 <button

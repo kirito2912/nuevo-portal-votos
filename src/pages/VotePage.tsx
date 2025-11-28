@@ -1127,8 +1127,8 @@ export default function VotePage() {
                   </p>
                 </CardContent>
               </Card>
-            </div>
-          )}
+            ))}
+          </div>
 
           {/* Grid de candidatos MEJORADO */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

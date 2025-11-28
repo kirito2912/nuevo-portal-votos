@@ -13,7 +13,7 @@ server_formats = [
 ]
 
 DB_DATABASE = "SISTEMA_ELECTORAL"
-DB_DRIVER = "ODBC Driver 17 for SQL Server"
+DB_DRIVER = "SQL Server"
 
 print("Probando diferentes formatos de conexion...\n")
 

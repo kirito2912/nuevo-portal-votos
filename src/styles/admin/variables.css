@@ -42,3 +42,20 @@
   --admin-spacing-xl: 3rem;
 }
 
+/* Clases utilitarias adicionales */
+.bg-dark-card {
+  background-color: var(--admin-bg-card);
+}
+
+.text-gray-300 {
+  color: #d1d5db;
+}
+
+.text-gray-700 {
+  color: #374151;
+}
+
+.border-gray-700 {
+  border-color: #374151;
+}
+
