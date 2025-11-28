@@ -13,8 +13,9 @@ import os
 from dotenv import load_dotenv
 import hashlib
 import secrets
+from simulated_storage import get_simulated_storage
 
-load_dotenv()
+load_dotenv("config.env")
 
 app = FastAPI(title="Sistema Electoral API", version="1.0.0")
 
@@ -35,7 +36,8 @@ def is_localhost_origin(origin: str) -> bool:
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?$",  # Permite cualquier puerto de localhost
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "http://127.0.0.1:3000"],  # Orígenes específicos
+    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?$",  # También permite cualquier puerto de localhost
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -55,23 +57,50 @@ async def root():
 # Configuración de conexión a SQL Server
 DB_SERVER = os.getenv("DB_SERVER", "electoral-system-2024.database.windows.net")
 DB_DATABASE = os.getenv("DB_DATABASE", "SISTEMA_ELECTORAL")
-DB_USER = os.getenv("DB_USER", "admin_electoral")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "Eduardo123")
-DB_DRIVER = os.getenv("DB_DRIVER", "ODBC Driver 17 for SQL Server")
-DB_TRUSTED_CONNECTION = os.getenv("DB_TRUSTED_CONNECTION", "false").lower() == "true"
+DB_USER = os.getenv("DB_USER", "")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+DB_DRIVER = os.getenv("DB_DRIVER", "SQL Server")
+DB_TRUSTED_CONNECTION = os.getenv("DB_TRUSTED_CONNECTION", "true").lower() == "true"
 
-def get_db_connection():
-    """Crea una conexión a SQL Server"""
-    try:
-        if DB_TRUSTED_CONNECTION:
+# Variable global para rastrear si SQL Server está disponible
+_db_available = None
+
+def check_db_availability():
+    """Verifica si SQL Server está disponible"""
+    global _db_available
+    if _db_available is None:
+        try:
+            conn = _try_db_connection()
+            conn.close()
+            _db_available = True
+        except:
+            _db_available = False
+    return _db_available
+
+def _try_db_connection():
+    """Intenta crear una conexión a SQL Server sin lanzar HTTPException"""
+    if DB_TRUSTED_CONNECTION:
+        # Usar autenticación de Windows (Trusted Connection)
+        connection_string = (
+            f"DRIVER={{{DB_DRIVER}}};"
+            f"SERVER={DB_SERVER};"
+            f"DATABASE={DB_DATABASE};"
+            "Trusted_Connection=yes;"
+            "TrustServerCertificate=yes;"
+        )
+    else:
+        # Usar autenticación con usuario y contraseña
+        # Para Azure SQL Database, detectar si es Azure y ajustar la cadena
+        is_azure = ".database.windows.net" in DB_SERVER.lower()
+        if is_azure:
             connection_string = (
                 f"DRIVER={{{DB_DRIVER}}};"
                 f"SERVER={DB_SERVER};"
                 f"DATABASE={DB_DATABASE};"
-                "Trusted_Connection=yes;"
+                f"UID={DB_USER};"
+                f"PWD={DB_PASSWORD};"
                 "Encrypt=yes;"
                 "TrustServerCertificate=no;"
-                "Connection Timeout=30;"
             )
         else:
             connection_string = (
@@ -84,13 +113,19 @@ def get_db_connection():
                 "TrustServerCertificate=no;"
                 "Connection Timeout=30;"
             )
-        conn = pyodbc.connect(connection_string)
+    return pyodbc.connect(connection_string)
+
+def get_db_connection():
+    """Crea una conexión a SQL Server. Si falla, lanza excepción para usar modo simulado"""
+    global _db_available
+    try:
+        conn = _try_db_connection()
+        _db_available = True
         return conn
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error de conexión a la base de datos: {str(e)}"
-        )
+        _db_available = False
+        # Lanzar excepción especial que será capturada para usar modo simulado
+        raise ConnectionError(f"SQL Server no disponible: {str(e)}")
 
 # ============================================================================
 # MODELOS PYDANTIC
@@ -292,53 +327,141 @@ async def create_votante(votante: VotanteCreate):
 @app.get("/api/votantes/{dni}")
 async def get_votante_by_dni(dni: str):
     """Obtiene un votante por DNI"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
     try:
-        cursor.execute(
-            """SELECT ID_VOTANTES, DNI, NOMBRES, APELLIDOS, FECHA_NACIMIENTO, REGION, DISTRITO, FECHA_VOTO
-               FROM VOTANTES WHERE DNI = ?""",
-            (dni,)
-        )
-        row = cursor.fetchone()
+        conn = get_db_connection()
+        cursor = conn.cursor()
         
-        if not row:
-            raise HTTPException(status_code=404, detail="Votante no encontrado")
+        try:
+            cursor.execute(
+                """SELECT ID_VOTANTES, DNI, NOMBRES, APELLIDOS, FECHA_NACIMIENTO, REGION, DISTRITO, FECHA_VOTO
+                   FROM VOTANTES WHERE DNI = ?""",
+                (dni,)
+            )
+            row = cursor.fetchone()
+            
+            if not row:
+                raise HTTPException(status_code=404, detail="Votante no encontrado")
+            
+            return {
+                "id_votantes": row[0],
+                "dni": row[1],
+                "nombres": row[2],
+                "apellidos": row[3],
+                "fecha_nacimiento": str(row[4]),
+                "region": row[5],
+                "distrito": row[6],
+                "fecha_voto": str(row[7]) if row[7] else None
+            }
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            cursor.close()
+            conn.close()
+    except ConnectionError:
+        # Modo simulado
+        storage = get_simulated_storage()
+        votante = storage.get_votante_by_dni(dni)
+        
+        if not votante:
+            # Crear votante simulado si no existe
+            from simulated_storage import VOTANTES_FILE
+            import random
+            id_votante = random.randint(1000, 9999)
+            votante = {
+                'id_votantes': id_votante,
+                'dni': dni,
+                'nombres': 'Votante',
+                'apellidos': 'Simulado',
+                'fecha_nacimiento': '2000-01-01',
+                'region': 'Lima',
+                'distrito': 'Lima',
+                'fecha_voto': None
+            }
+            storage._votantes[str(id_votante)] = votante
+            storage._save_json(VOTANTES_FILE, storage._votantes)
         
         return {
-            "id_votantes": row[0],
-            "dni": row[1],
-            "nombres": row[2],
-            "apellidos": row[3],
-            "fecha_nacimiento": str(row[4]),
-            "region": row[5],
-            "distrito": row[6],
-            "fecha_voto": str(row[7]) if row[7] else None
+            "id_votantes": votante.get('id_votantes'),
+            "dni": votante.get('dni', dni),
+            "nombres": votante.get('nombres', 'Votante'),
+            "apellidos": votante.get('apellidos', 'Simulado'),
+            "fecha_nacimiento": votante.get('fecha_nacimiento', '2000-01-01'),
+            "region": votante.get('region', 'Lima'),
+            "distrito": votante.get('distrito', 'Lima'),
+            "fecha_voto": votante.get('fecha_voto')
         }
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
 @app.get("/api/votantes/{dni}/status", response_model=VotanteStatus)
 async def get_votante_status(dni: str):
     """Devuelve el estado de voto de un votante por DNI"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
     try:
-        # Buscar votante por DNI
-        cursor.execute(
-            "SELECT ID_VOTANTES FROM VOTANTES WHERE DNI = ?",
-            (dni,)
-        )
-        row = cursor.fetchone()
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-        if not row:
+        try:
+            # Buscar votante por DNI
+            cursor.execute(
+                "SELECT ID_VOTANTES FROM VOTANTES WHERE DNI = ?",
+                (dni,)
+            )
+            row = cursor.fetchone()
+
+            if not row:
+                # No existe votante: puede votar en todas las categorías
+                return VotanteStatus(
+                    can_vote_presidencial=True,
+                    can_vote_regional=True,
+                    can_vote_distrital=True,
+                    has_all_votes=False
+                )
+
+            id_votantes = row[0]
+
+            # Contar votos por categoría
+            cursor.execute(
+                "SELECT COUNT(*) FROM VOTO_PRESIDENCIAL WHERE ID_VOTANTES = ?",
+                (id_votantes,)
+            )
+            votos_presidenciales = cursor.fetchone()[0] or 0
+            cursor.execute(
+                "SELECT COUNT(*) FROM VOTO_REGIONAL WHERE ID_VOTANTES = ?",
+                (id_votantes,)
+            )
+            votos_regionales = cursor.fetchone()[0] or 0
+            cursor.execute(
+                "SELECT COUNT(*) FROM VOTO_DISTRITAL WHERE ID_VOTANTES = ?",
+                (id_votantes,)
+            )
+            votos_distritales = cursor.fetchone()[0] or 0
+
+            can_vote_presidencial = votos_presidenciales < 1
+            can_vote_regional = votos_regionales < 1
+            can_vote_distrital = votos_distritales < 1
+            has_all_votes = (
+                votos_presidenciales >= 1 and
+                votos_regionales >= 1 and
+                votos_distritales >= 1
+            )
+
+            return VotanteStatus(
+                can_vote_presidencial=can_vote_presidencial,
+                can_vote_regional=can_vote_regional,
+                can_vote_distrital=can_vote_distrital,
+                has_all_votes=has_all_votes
+            )
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            cursor.close()
+            conn.close()
+    except ConnectionError:
+        # Modo simulado
+        storage = get_simulated_storage()
+        votante = storage.get_votante_by_dni(dni)
+        
+        if not votante:
             # No existe votante: puede votar en todas las categorías
             return VotanteStatus(
                 can_vote_presidencial=True,
@@ -346,26 +469,14 @@ async def get_votante_status(dni: str):
                 can_vote_distrital=True,
                 has_all_votes=False
             )
-
-        id_votantes = row[0]
-
+        
+        id_votantes = votante.get('id_votantes')
+        
         # Contar votos por categoría
-        cursor.execute(
-            "SELECT COUNT(*) FROM VOTO_PRESIDENCIAL WHERE ID_VOTANTES = ?",
-            (id_votantes,)
-        )
-        votos_presidenciales = cursor.fetchone()[0] or 0
-        cursor.execute(
-            "SELECT COUNT(*) FROM VOTO_REGIONAL WHERE ID_VOTANTES = ?",
-            (id_votantes,)
-        )
-        votos_regionales = cursor.fetchone()[0] or 0
-        cursor.execute(
-            "SELECT COUNT(*) FROM VOTO_DISTRITAL WHERE ID_VOTANTES = ?",
-            (id_votantes,)
-        )
-        votos_distritales = cursor.fetchone()[0] or 0
-
+        votos_presidenciales = storage.count_votos_presidenciales(id_votantes)
+        votos_regionales = storage.count_votos_regionales(id_votantes)
+        votos_distritales = storage.count_votos_distritales(id_votantes)
+        
         can_vote_presidencial = votos_presidenciales < 1
         can_vote_regional = votos_regionales < 1
         can_vote_distrital = votos_distritales < 1
@@ -374,18 +485,13 @@ async def get_votante_status(dni: str):
             votos_regionales >= 1 and
             votos_distritales >= 1
         )
-
+        
         return VotanteStatus(
             can_vote_presidencial=can_vote_presidencial,
             can_vote_regional=can_vote_regional,
             can_vote_distrital=can_vote_distrital,
             has_all_votes=has_all_votes
         )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
 @app.get("/api/votantes")
 async def get_all_votantes(limit: int = 100, offset: int = 0):
@@ -602,264 +708,453 @@ async def create_candidato_distrital(candidato: CandidatoDistritalCreate):
 @app.post("/api/votos/presidencial")
 async def create_voto_presidencial(voto: VotoPresidencialCreate):
     """Registra un voto presidencial"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
     try:
-        # Verificar si el votante existe
-        cursor.execute(
-            "SELECT ID_VOTANTES FROM VOTANTES WHERE ID_VOTANTES = ?",
-            (voto.id_votantes,)
-        )
-        votante = cursor.fetchone()
+        conn = get_db_connection()
+        cursor = conn.cursor()
         
+        try:
+            # Verificar si el votante existe
+            cursor.execute(
+                "SELECT ID_VOTANTES FROM VOTANTES WHERE ID_VOTANTES = ?",
+                (voto.id_votantes,)
+            )
+            votante = cursor.fetchone()
+            
+            if not votante:
+                raise HTTPException(status_code=404, detail="Votante no encontrado")
+            
+            # Verificar si el votante ya emitió los tres tipos de voto
+            cursor.execute(
+                "SELECT COUNT(*) FROM VOTO_PRESIDENCIAL WHERE ID_VOTANTES = ?",
+                (voto.id_votantes,)
+            )
+            votos_presidenciales = cursor.fetchone()[0] or 0
+            cursor.execute(
+                "SELECT COUNT(*) FROM VOTO_REGIONAL WHERE ID_VOTANTES = ?",
+                (voto.id_votantes,)
+            )
+            votos_regionales = cursor.fetchone()[0] or 0
+            cursor.execute(
+                "SELECT COUNT(*) FROM VOTO_DISTRITAL WHERE ID_VOTANTES = ?",
+                (voto.id_votantes,)
+            )
+            votos_distritales = cursor.fetchone()[0] or 0
+            
+            if votos_presidenciales >= 1 and votos_regionales >= 1 and votos_distritales >= 1:
+                raise HTTPException(
+                    status_code=400,
+                    detail="El votante ya ha ejercido todos sus votos (presidencial, regional y distrital)"
+                )
+
+            # Verificar si ya votó presidencial
+            if votos_presidenciales >= 1:
+                raise HTTPException(
+                    status_code=400,
+                    detail="El votante ya ha ejercido su voto presidencial"
+                )
+            
+            # Obtener datos del candidato
+            cursor.execute(
+                "SELECT NOMBRES, APELLIDOS FROM CANDIDATO_PRESIDENCIAL WHERE ID_CANDIDATO_PRESIDENCIAL = ?",
+                (voto.id_candidato,)
+            )
+            candidato = cursor.fetchone()
+            
+            if not candidato:
+                raise HTTPException(status_code=404, detail="Candidato no encontrado")
+            
+            # Registrar el voto
+            cursor.execute(
+                """INSERT INTO VOTO_PRESIDENCIAL (ID_VOTANTES, ID_CANDIDATO, NOMBRE, APELLIDO)
+                   VALUES (?, ?, ?, ?)""",
+                (voto.id_votantes, voto.id_candidato, candidato[0], candidato[1])
+            )
+            
+            # Actualizar cantidad de votos del candidato
+            cursor.execute(
+                "UPDATE CANDIDATO_PRESIDENCIAL SET CANTIDAD_VOTOS = CANTIDAD_VOTOS + 1 WHERE ID_CANDIDATO_PRESIDENCIAL = ?",
+                (voto.id_candidato,)
+            )
+            
+            # Actualizar votante
+            cursor.execute(
+                "UPDATE VOTANTES SET FECHA_VOTO = ? WHERE ID_VOTANTES = ?",
+                (datetime.now(), voto.id_votantes)
+            )
+            
+            conn.commit()
+            
+            return {
+                "message": "Voto presidencial registrado exitosamente"
+            }
+        except HTTPException:
+            raise
+        except Exception as e:
+            conn.rollback()
+            raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            cursor.close()
+            conn.close()
+    except ConnectionError:
+        # Modo simulado: usar almacenamiento en archivo JSON
+        storage = get_simulated_storage()
+        
+        # Verificar si el votante existe (simulado - asumimos que existe si tiene ID)
+        votante = storage.get_votante(voto.id_votantes)
         if not votante:
-            raise HTTPException(status_code=404, detail="Votante no encontrado")
+            # En modo simulado, creamos el votante si no existe
+            from simulated_storage import VOTANTES_FILE
+            storage._votantes[str(voto.id_votantes)] = {
+                'id_votantes': voto.id_votantes,
+                'dni': f'DNI{voto.id_votantes}',
+                'fecha_voto': None
+            }
+            storage._save_json(VOTANTES_FILE, storage._votantes)
         
-        # Verificar si el votante ya emitió los tres tipos de voto
-        cursor.execute(
-            "SELECT COUNT(*) FROM VOTO_PRESIDENCIAL WHERE ID_VOTANTES = ?",
-            (voto.id_votantes,)
-        )
-        votos_presidenciales = cursor.fetchone()[0] or 0
-        cursor.execute(
-            "SELECT COUNT(*) FROM VOTO_REGIONAL WHERE ID_VOTANTES = ?",
-            (voto.id_votantes,)
-        )
-        votos_regionales = cursor.fetchone()[0] or 0
-        cursor.execute(
-            "SELECT COUNT(*) FROM VOTO_DISTRITAL WHERE ID_VOTANTES = ?",
-            (voto.id_votantes,)
-        )
-        votos_distritales = cursor.fetchone()[0] or 0
+        # Verificar votos existentes
+        votos_presidenciales = storage.count_votos_presidenciales(voto.id_votantes)
+        votos_regionales = storage.count_votos_regionales(voto.id_votantes)
+        votos_distritales = storage.count_votos_distritales(voto.id_votantes)
         
         if votos_presidenciales >= 1 and votos_regionales >= 1 and votos_distritales >= 1:
             raise HTTPException(
                 status_code=400,
                 detail="El votante ya ha ejercido todos sus votos (presidencial, regional y distrital)"
             )
-
-        # Verificar si ya votó presidencial
+        
         if votos_presidenciales >= 1:
             raise HTTPException(
                 status_code=400,
                 detail="El votante ya ha ejercido su voto presidencial"
             )
         
-        # Obtener datos del candidato
-        cursor.execute(
-            "SELECT NOMBRES, APELLIDOS FROM CANDIDATO_PRESIDENCIAL WHERE ID_CANDIDATO_PRESIDENCIAL = ?",
-            (voto.id_candidato,)
-        )
-        candidato = cursor.fetchone()
-        
+        # Obtener candidato (simulado)
+        candidato = storage.get_candidato_presidencial(voto.id_candidato)
         if not candidato:
-            raise HTTPException(status_code=404, detail="Candidato no encontrado")
+            # Crear candidato simulado si no existe
+            from simulated_storage import CANDIDATOS_PRESIDENCIALES_FILE
+            candidato = {
+                'nombres': f'Candidato {voto.id_candidato}',
+                'apellidos': 'Presidencial'
+            }
+            storage._candidatos_presidenciales[str(voto.id_candidato)] = {
+                'id_candidato': voto.id_candidato,
+                'nombres': candidato['nombres'],
+                'apellidos': candidato['apellidos'],
+                'cantidad_votos': 0
+            }
+            storage._save_json(CANDIDATOS_PRESIDENCIALES_FILE, storage._candidatos_presidenciales)
+        else:
+            candidato = {
+                'nombres': candidato.get('nombres', f'Candidato {voto.id_candidato}'),
+                'apellidos': candidato.get('apellidos', 'Presidencial')
+            }
         
-        # Registrar el voto
-        cursor.execute(
-            """INSERT INTO VOTO_PRESIDENCIAL (ID_VOTANTES, ID_CANDIDATO, NOMBRE, APELLIDO)
-               VALUES (?, ?, ?, ?)""",
-            (voto.id_votantes, voto.id_candidato, candidato[0], candidato[1])
+        # Registrar voto
+        storage.add_voto_presidencial(
+            voto.id_votantes,
+            voto.id_candidato,
+            candidato['nombres'],
+            candidato['apellidos']
         )
         
-        # Actualizar cantidad de votos del candidato
-        cursor.execute(
-            "UPDATE CANDIDATO_PRESIDENCIAL SET CANTIDAD_VOTOS = CANTIDAD_VOTOS + 1 WHERE ID_CANDIDATO_PRESIDENCIAL = ?",
-            (voto.id_candidato,)
-        )
+        # Actualizar contador de votos
+        storage.update_candidato_presidencial_votos(voto.id_candidato, 1)
         
-        # Actualizar votante
-        cursor.execute(
-            "UPDATE VOTANTES SET FECHA_VOTO = ? WHERE ID_VOTANTES = ?",
-            (datetime.now(), voto.id_votantes)
-        )
-        
-        conn.commit()
+        # Actualizar fecha de voto del votante
+        storage.update_votante_fecha_voto(voto.id_votantes, datetime.now())
         
         return {
-            "message": "Voto presidencial registrado exitosamente"
+            "message": "Voto presidencial registrado exitosamente (modo simulado)"
         }
-    except HTTPException:
-        raise
-    except Exception as e:
-        conn.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
 @app.post("/api/votos/regional")
 async def create_voto_regional(voto: VotoRegionalCreate):
     """Registra un voto regional"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
     try:
-        # Verificar que el votante existe
-        cursor.execute(
-            "SELECT ID_VOTANTES FROM VOTANTES WHERE ID_VOTANTES = ?",
-            (voto.id_votantes,)
-        )
-        votante = cursor.fetchone()
+        conn = get_db_connection()
+        cursor = conn.cursor()
         
-        if not votante:
-            raise HTTPException(status_code=404, detail="Votante no encontrado")
+        try:
+            # Verificar que el votante existe
+            cursor.execute(
+                "SELECT ID_VOTANTES FROM VOTANTES WHERE ID_VOTANTES = ?",
+                (voto.id_votantes,)
+            )
+            votante = cursor.fetchone()
+            
+            if not votante:
+                raise HTTPException(status_code=404, detail="Votante no encontrado")
 
-        # Verificar si el votante ya emitió los tres tipos de voto
-        cursor.execute(
-            "SELECT COUNT(*) FROM VOTO_PRESIDENCIAL WHERE ID_VOTANTES = ?",
-            (voto.id_votantes,)
-        )
-        votos_presidenciales = cursor.fetchone()[0] or 0
-        cursor.execute(
-            "SELECT COUNT(*) FROM VOTO_REGIONAL WHERE ID_VOTANTES = ?",
-            (voto.id_votantes,)
-        )
-        votos_regionales = cursor.fetchone()[0] or 0
-        cursor.execute(
-            "SELECT COUNT(*) FROM VOTO_DISTRITAL WHERE ID_VOTANTES = ?",
-            (voto.id_votantes,)
-        )
-        votos_distritales = cursor.fetchone()[0] or 0
+            # Verificar si el votante ya emitió los tres tipos de voto
+            cursor.execute(
+                "SELECT COUNT(*) FROM VOTO_PRESIDENCIAL WHERE ID_VOTANTES = ?",
+                (voto.id_votantes,)
+            )
+            votos_presidenciales = cursor.fetchone()[0] or 0
+            cursor.execute(
+                "SELECT COUNT(*) FROM VOTO_REGIONAL WHERE ID_VOTANTES = ?",
+                (voto.id_votantes,)
+            )
+            votos_regionales = cursor.fetchone()[0] or 0
+            cursor.execute(
+                "SELECT COUNT(*) FROM VOTO_DISTRITAL WHERE ID_VOTANTES = ?",
+                (voto.id_votantes,)
+            )
+            votos_distritales = cursor.fetchone()[0] or 0
+            if votos_presidenciales >= 1 and votos_regionales >= 1 and votos_distritales >= 1:
+                raise HTTPException(
+                    status_code=400,
+                    detail="El votante ya ha ejercido todos sus votos (presidencial, regional y distrital)"
+                )
+
+            # Verificar si ya votó regional (solo se permite un voto regional)
+            if votos_regionales >= 1:
+                raise HTTPException(
+                    status_code=400,
+                    detail="El votante ya ha ejercido su voto regional"
+                )
+            
+            # Obtener datos del candidato
+            cursor.execute(
+                "SELECT NOMBRES, APELLIDOS FROM CANDIDATO_REGIONAL WHERE ID_CANDIDATO_REGIONAL = ?",
+                (voto.id_candidato_regional,)
+            )
+            candidato = cursor.fetchone()
+            
+            if not candidato:
+                raise HTTPException(status_code=404, detail="Candidato regional no encontrado")
+            
+            # Registrar el voto
+            cursor.execute(
+                """INSERT INTO VOTO_REGIONAL (ID_VOTANTES, ID_CANDIDATO_REGIONAL, NOMBRE, APELLIDO)
+                   VALUES (?, ?, ?, ?)""",
+                (voto.id_votantes, voto.id_candidato_regional, candidato[0], candidato[1])
+            )
+            
+            # Actualizar cantidad de votos del candidato
+            cursor.execute(
+                "UPDATE CANDIDATO_REGIONAL SET CANTIDAD_VOTOS = CANTIDAD_VOTOS + 1 WHERE ID_CANDIDATO_REGIONAL = ?",
+                (voto.id_candidato_regional,)
+            )
+            
+            conn.commit()
+            
+            return {
+                "message": "Voto regional registrado exitosamente"
+            }
+        except HTTPException:
+            raise
+        except Exception as e:
+            conn.rollback()
+            raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            cursor.close()
+            conn.close()
+    except ConnectionError:
+        # Modo simulado
+        storage = get_simulated_storage()
+        from simulated_storage import VOTANTES_FILE, CANDIDATOS_REGIONALES_FILE
+        
+        votante = storage.get_votante(voto.id_votantes)
+        if not votante:
+            storage._votantes[str(voto.id_votantes)] = {
+                'id_votantes': voto.id_votantes,
+                'dni': f'DNI{voto.id_votantes}',
+                'fecha_voto': None
+            }
+            storage._save_json(VOTANTES_FILE, storage._votantes)
+        
+        votos_presidenciales = storage.count_votos_presidenciales(voto.id_votantes)
+        votos_regionales = storage.count_votos_regionales(voto.id_votantes)
+        votos_distritales = storage.count_votos_distritales(voto.id_votantes)
+        
         if votos_presidenciales >= 1 and votos_regionales >= 1 and votos_distritales >= 1:
             raise HTTPException(
                 status_code=400,
                 detail="El votante ya ha ejercido todos sus votos (presidencial, regional y distrital)"
             )
-
-        # Verificar si ya votó regional (solo se permite un voto regional)
+        
         if votos_regionales >= 1:
             raise HTTPException(
                 status_code=400,
                 detail="El votante ya ha ejercido su voto regional"
             )
         
-        # Obtener datos del candidato
-        cursor.execute(
-            "SELECT NOMBRES, APELLIDOS FROM CANDIDATO_REGIONAL WHERE ID_CANDIDATO_REGIONAL = ?",
-            (voto.id_candidato_regional,)
-        )
-        candidato = cursor.fetchone()
-        
+        candidato = storage.get_candidato_regional(voto.id_candidato_regional)
         if not candidato:
-            raise HTTPException(status_code=404, detail="Candidato regional no encontrado")
+            candidato = {
+                'nombres': f'Candidato {voto.id_candidato_regional}',
+                'apellidos': 'Regional'
+            }
+            storage._candidatos_regionales[str(voto.id_candidato_regional)] = {
+                'id_candidato': voto.id_candidato_regional,
+                'nombres': candidato['nombres'],
+                'apellidos': candidato['apellidos'],
+                'cantidad_votos': 0
+            }
+            storage._save_json(CANDIDATOS_REGIONALES_FILE, storage._candidatos_regionales)
+        else:
+            candidato = {
+                'nombres': candidato.get('nombres', f'Candidato {voto.id_candidato_regional}'),
+                'apellidos': candidato.get('apellidos', 'Regional')
+            }
         
-        # Verificar si ya votó regional (opcional - depende de las reglas de negocio)
-        # Por ahora permitimos múltiples votos regionales si es necesario
-        
-        # Registrar el voto
-        cursor.execute(
-            """INSERT INTO VOTO_REGIONAL (ID_VOTANTES, ID_CANDIDATO_REGIONAL, NOMBRE, APELLIDO)
-               VALUES (?, ?, ?, ?)""",
-            (voto.id_votantes, voto.id_candidato_regional, candidato[0], candidato[1])
+        storage.add_voto_regional(
+            voto.id_votantes,
+            voto.id_candidato_regional,
+            candidato['nombres'],
+            candidato['apellidos']
         )
-        
-        # Actualizar cantidad de votos del candidato
-        cursor.execute(
-            "UPDATE CANDIDATO_REGIONAL SET CANTIDAD_VOTOS = CANTIDAD_VOTOS + 1 WHERE ID_CANDIDATO_REGIONAL = ?",
-            (voto.id_candidato_regional,)
-        )
-        
-        conn.commit()
+        storage.update_candidato_regional_votos(voto.id_candidato_regional, 1)
         
         return {
-            "message": "Voto regional registrado exitosamente"
+            "message": "Voto regional registrado exitosamente (modo simulado)"
         }
-    except HTTPException:
-        raise
-    except Exception as e:
-        conn.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
 @app.post("/api/votos/distrital")
 async def create_voto_distrital(voto: VotoDistritalCreate):
     """Registra un voto distrital"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
     try:
-        # Verificar que el votante existe
-        cursor.execute(
-            "SELECT ID_VOTANTES FROM VOTANTES WHERE ID_VOTANTES = ?",
-            (voto.id_votantes,)
-        )
-        votante = cursor.fetchone()
+        conn = get_db_connection()
+        cursor = conn.cursor()
         
-        if not votante:
-            raise HTTPException(status_code=404, detail="Votante no encontrado")
+        try:
+            # Verificar que el votante existe
+            cursor.execute(
+                "SELECT ID_VOTANTES FROM VOTANTES WHERE ID_VOTANTES = ?",
+                (voto.id_votantes,)
+            )
+            votante = cursor.fetchone()
+            
+            if not votante:
+                raise HTTPException(status_code=404, detail="Votante no encontrado")
 
-        # Verificar si el votante ya emitió los tres tipos de voto
-        cursor.execute(
-            "SELECT COUNT(*) FROM VOTO_PRESIDENCIAL WHERE ID_VOTANTES = ?",
-            (voto.id_votantes,)
-        )
-        votos_presidenciales = cursor.fetchone()[0] or 0
-        cursor.execute(
-            "SELECT COUNT(*) FROM VOTO_REGIONAL WHERE ID_VOTANTES = ?",
-            (voto.id_votantes,)
-        )
-        votos_regionales = cursor.fetchone()[0] or 0
-        cursor.execute(
-            "SELECT COUNT(*) FROM VOTO_DISTRITAL WHERE ID_VOTANTES = ?",
-            (voto.id_votantes,)
-        )
-        votos_distritales = cursor.fetchone()[0] or 0
+            # Verificar si el votante ya emitió los tres tipos de voto
+            cursor.execute(
+                "SELECT COUNT(*) FROM VOTO_PRESIDENCIAL WHERE ID_VOTANTES = ?",
+                (voto.id_votantes,)
+            )
+            votos_presidenciales = cursor.fetchone()[0] or 0
+            cursor.execute(
+                "SELECT COUNT(*) FROM VOTO_REGIONAL WHERE ID_VOTANTES = ?",
+                (voto.id_votantes,)
+            )
+            votos_regionales = cursor.fetchone()[0] or 0
+            cursor.execute(
+                "SELECT COUNT(*) FROM VOTO_DISTRITAL WHERE ID_VOTANTES = ?",
+                (voto.id_votantes,)
+            )
+            votos_distritales = cursor.fetchone()[0] or 0
+            if votos_presidenciales >= 1 and votos_regionales >= 1 and votos_distritales >= 1:
+                raise HTTPException(
+                    status_code=400,
+                    detail="El votante ya ha ejercido todos sus votos (presidencial, regional y distrital)"
+                )
+
+            # Verificar si ya votó distrital (solo se permite un voto distrital)
+            if votos_distritales >= 1:
+                raise HTTPException(
+                    status_code=400,
+                    detail="El votante ya ha ejercido su voto distrital"
+                )
+            
+            # Obtener datos del candidato
+            cursor.execute(
+                "SELECT NOMBRES, APELLIDOS FROM CANDIDATO_DISTRITAL WHERE ID_CANDIDATO_DISTRITAL = ?",
+                (voto.id_candidato_distrital,)
+            )
+            candidato = cursor.fetchone()
+            
+            if not candidato:
+                raise HTTPException(status_code=404, detail="Candidato distrital no encontrado")
+            
+            # Registrar el voto
+            cursor.execute(
+                """INSERT INTO VOTO_DISTRITAL (ID_VOTANTES, ID_CANDIDATO_DISTRITAL, NOMBRE, APELLIDO)
+                   VALUES (?, ?, ?, ?)""",
+                (voto.id_votantes, voto.id_candidato_distrital, candidato[0], candidato[1])
+            )
+            
+            # Actualizar cantidad de votos del candidato
+            cursor.execute(
+                "UPDATE CANDIDATO_DISTRITAL SET CANTIDAD_VOTOS = CANTIDAD_VOTOS + 1 WHERE ID_CANDIDATO_DISTRITAL = ?",
+                (voto.id_candidato_distrital,)
+            )
+            
+            conn.commit()
+            
+            return {
+                "message": "Voto distrital registrado exitosamente"
+            }
+        except HTTPException:
+            raise
+        except Exception as e:
+            conn.rollback()
+            raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            cursor.close()
+            conn.close()
+    except ConnectionError:
+        # Modo simulado
+        storage = get_simulated_storage()
+        from simulated_storage import VOTANTES_FILE, CANDIDATOS_DISTRITALES_FILE
+        
+        votante = storage.get_votante(voto.id_votantes)
+        if not votante:
+            storage._votantes[str(voto.id_votantes)] = {
+                'id_votantes': voto.id_votantes,
+                'dni': f'DNI{voto.id_votantes}',
+                'fecha_voto': None
+            }
+            storage._save_json(VOTANTES_FILE, storage._votantes)
+        
+        votos_presidenciales = storage.count_votos_presidenciales(voto.id_votantes)
+        votos_regionales = storage.count_votos_regionales(voto.id_votantes)
+        votos_distritales = storage.count_votos_distritales(voto.id_votantes)
+        
         if votos_presidenciales >= 1 and votos_regionales >= 1 and votos_distritales >= 1:
             raise HTTPException(
                 status_code=400,
                 detail="El votante ya ha ejercido todos sus votos (presidencial, regional y distrital)"
             )
-
-        # Verificar si ya votó distrital (solo se permite un voto distrital)
+        
         if votos_distritales >= 1:
             raise HTTPException(
                 status_code=400,
                 detail="El votante ya ha ejercido su voto distrital"
             )
         
-        # Obtener datos del candidato
-        cursor.execute(
-            "SELECT NOMBRES, APELLIDOS FROM CANDIDATO_DISTRITAL WHERE ID_CANDIDATO_DISTRITAL = ?",
-            (voto.id_candidato_distrital,)
-        )
-        candidato = cursor.fetchone()
-        
+        candidato = storage.get_candidato_distrital(voto.id_candidato_distrital)
         if not candidato:
-            raise HTTPException(status_code=404, detail="Candidato distrital no encontrado")
+            candidato = {
+                'nombres': f'Candidato {voto.id_candidato_distrital}',
+                'apellidos': 'Distrital'
+            }
+            storage._candidatos_distritales[str(voto.id_candidato_distrital)] = {
+                'id_candidato': voto.id_candidato_distrital,
+                'nombres': candidato['nombres'],
+                'apellidos': candidato['apellidos'],
+                'cantidad_votos': 0
+            }
+            storage._save_json(CANDIDATOS_DISTRITALES_FILE, storage._candidatos_distritales)
+        else:
+            candidato = {
+                'nombres': candidato.get('nombres', f'Candidato {voto.id_candidato_distrital}'),
+                'apellidos': candidato.get('apellidos', 'Distrital')
+            }
         
-        # Verificar si ya votó distrital (opcional - depende de las reglas de negocio)
-        # Por ahora permitimos múltiples votos distritales si es necesario
-        
-        # Registrar el voto
-        cursor.execute(
-            """INSERT INTO VOTO_DISTRITAL (ID_VOTANTES, ID_CANDIDATO_DISTRITAL, NOMBRE, APELLIDO)
-               VALUES (?, ?, ?, ?)""",
-            (voto.id_votantes, voto.id_candidato_distrital, candidato[0], candidato[1])
+        storage.add_voto_distrital(
+            voto.id_votantes,
+            voto.id_candidato_distrital,
+            candidato['nombres'],
+            candidato['apellidos']
         )
-        
-        # Actualizar cantidad de votos del candidato
-        cursor.execute(
-            "UPDATE CANDIDATO_DISTRITAL SET CANTIDAD_VOTOS = CANTIDAD_VOTOS + 1 WHERE ID_CANDIDATO_DISTRITAL = ?",
-            (voto.id_candidato_distrital,)
-        )
-        
-        conn.commit()
+        storage.update_candidato_distrital_votos(voto.id_candidato_distrital, 1)
         
         return {
-            "message": "Voto distrital registrado exitosamente"
+            "message": "Voto distrital registrado exitosamente (modo simulado)"
         }
-    except HTTPException:
-        raise
-    except Exception as e:
-        conn.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cursor.close()
-        conn.close()
 
 @app.post("/api/votos/nulo")
 async def create_voto_nulo(voto: VotoNuloCreate):
