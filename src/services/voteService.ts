@@ -158,12 +158,17 @@ export const getVotanteByDni = async (dni: string): Promise<Votante | null> => {
     
     return await response.json();
   } catch (error) {
+    // Si es error de conexión, retornar null para continuar con Factiliza
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      console.warn('⚠️ Backend no disponible, continuando con Factiliza');
+      return null;
+    }
     // Solo lanzar error si no es un 404
     if (error instanceof Error && error.message === 'Votante no encontrado') {
       return null;
     }
     console.error('Error fetching votante:', error);
-    throw error;
+    return null; // Retornar null en lugar de lanzar error
   }
 };
 

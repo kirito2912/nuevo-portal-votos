@@ -413,9 +413,13 @@ export default function VotePage() {
             
             if (!token) {
               console.warn("⚠️ Token de Factiliza no configurado. Configure el token en la interfaz.");
+              setError("Configure el token de Factiliza para autocompletar datos del DNI");
               setLoadingDniInfo(false);
               return;
             }
+            
+            // Limpiar error previo
+            setError("");
             
             const factilizaResponse = await getDniInfoFromFactiliza(voterDni, token);
             console.log("📡 Respuesta de Factiliza:", factilizaResponse);
