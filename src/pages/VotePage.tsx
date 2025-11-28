@@ -375,9 +375,8 @@ export default function VotePage() {
   const [voterFechaNacimiento, setVoterFechaNacimiento] = useState("");
   const [voterRegion, setVoterRegion] = useState(""); 
   const [voterDistrito, setVoterDistrito] = useState(""); 
-  const [showApiConfig, setShowApiConfig] = useState(false);
-  const [apiToken, setApiToken] = useState("");
-  const [apiUrl, setApiUrl] = useState("");
+  const [, setApiToken] = useState("");
+  const [, setApiUrl] = useState("");
   const [isMinor, setIsMinor] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -427,7 +426,7 @@ export default function VotePage() {
   const [presidentialCandidatesFromDB, setPresidentialCandidatesFromDB] = useState<Candidato[]>([]);
   const [regionalCandidatesFromDB, setRegionalCandidatesFromDB] = useState<Candidato[]>([]);
   const [distritalCandidatesFromDB, setDistritalCandidatesFromDB] = useState<Candidato[]>([]);
-  const [loadingCandidates, setLoadingCandidates] = useState(false);
+  const [, setLoadingCandidates] = useState(false);
   
   // Estados para controlar qué categorías ya fueron votadas
   const [hasVotedPresidencial, setHasVotedPresidencial] = useState(false);
@@ -1127,8 +1126,8 @@ export default function VotePage() {
                   </p>
                 </CardContent>
               </Card>
-            </div>
-          )}
+            ))}
+          </div>
 
           {/* Grid de candidatos MEJORADO */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
