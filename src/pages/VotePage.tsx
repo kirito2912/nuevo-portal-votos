@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+// VotePage.tsx - Sistema Electoral Nacional
+// Última actualización: 2025-11-27
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +18,7 @@ import {
   createVotoPresidencial,
   createVotoRegional,
   createVotoDistrital,
+  getDniInfoFromFactiliza,
   type Candidato
 } from "@/services/voteService";
 
@@ -375,43 +378,242 @@ export default function VotePage() {
   const [voterFechaNacimiento, setVoterFechaNacimiento] = useState("");
   const [voterRegion, setVoterRegion] = useState(""); 
   const [voterDistrito, setVoterDistrito] = useState(""); 
-  const [showApiConfig, setShowApiConfig] = useState(false);
-  const [apiToken, setApiToken] = useState("");
-  const [apiUrl, setApiUrl] = useState("");
+  const [factilizaToken, setFactilizaToken] = useState("");
+  const [showTokenConfig, setShowTokenConfig] = useState(false);
   const [isMinor, setIsMinor] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  useEffect(() => {
-    let active = true
-    const run = async () => {
-      if (/^\d{8}$/.test(voterDni)) {
-        try {
-          const rec = await getVotanteByDni(voterDni)
-          if (!active) return
-          if (rec) {
-            setVoterName(rec.nombres || "")
-            setVoterApellidos(rec.apellidos || "")
-            setVoterFechaNacimiento(rec.fecha_nacimiento || "")
-            setVoterRegion(rec.region || "")
-            setVoterDistrito(rec.distrito || "")
-          }
-        } catch (error) {
-          console.error("Error fetching votante:", error)
-        }
-      }
+  const [loadingDniInfo, setLoadingDniInfo] = useState(false);
+  
+  // Refs para acceso directo a los inputs
+  const nombreInputRef = useRef<HTMLInputElement>(null);
+  const apellidosInputRef = useRef<HTMLInputElement>(null);
+  const fechaInputRef = useRef<HTMLInputElement>(null);
+  
+  // Función manual para autocompletar (botón) - VERSIÓN AGRESIVA
+  const handleManualAutocomplete = async () => {
+    if (!/^\d{8}$/.test(voterDni)) {
+      alert("Por favor ingrese un DNI válido de 8 dígitos");
+      return;
     }
-    run()
-    return () => { active = false }
+    
+    setLoadingDniInfo(true);
+    setError("");
+    
+    try {
+      const token = localStorage.getItem('sen:factilizaToken') || '';
+      if (!token) {
+        alert("⚠️ Configure el token de Factiliza primero\n\nHaga clic en 'Configurar API Factiliza' abajo");
+        setLoadingDniInfo(false);
+        return;
+      }
+      
+      const response = await getDniInfoFromFactiliza(voterDni, token);
+      
+      if (response.success && response.data) {
+        const data: any = response.data;
+        const nombres = (data.nombres || "").trim();
+        const apellidos = `${(data.apellido_paterno || "").trim()} ${(data.apellido_materno || "").trim()}`.trim();
+        const fecha = (data.fecha_nacimiento || "").trim();
+        
+        console.log("🎯 ACTUALIZANDO MANUALMENTE:", { nombres, apellidos, fecha });
+        
+        // Método 1: Refs
+        if (nombreInputRef.current) {
+          nombreInputRef.current.value = nombres;
+          console.log("✅ Ref nombre:", nombreInputRef.current.value);
+        }
+        if (apellidosInputRef.current) {
+          apellidosInputRef.current.value = apellidos;
+          console.log("✅ Ref apellidos:", apellidosInputRef.current.value);
+        }
+        if (fechaInputRef.current) {
+          fechaInputRef.current.value = fecha;
+          console.log("✅ Ref fecha:", fechaInputRef.current.value);
+        }
+        
+        // Método 2: getElementById
+        const nombreEl = document.getElementById('nombre') as HTMLInputElement;
+        const apellidosEl = document.getElementById('apellidos') as HTMLInputElement;
+        const fechaEl = document.getElementById('fechaNacimiento') as HTMLInputElement;
+        
+        if (nombreEl) {
+          nombreEl.value = nombres;
+          nombreEl.setAttribute('value', nombres);
+          console.log("✅ getElementById nombre:", nombreEl.value);
+        }
+        if (apellidosEl) {
+          apellidosEl.value = apellidos;
+          apellidosEl.setAttribute('value', apellidos);
+          console.log("✅ getElementById apellidos:", apellidosEl.value);
+        }
+        if (fechaEl) {
+          fechaEl.value = fecha;
+          fechaEl.setAttribute('value', fecha);
+          console.log("✅ getElementById fecha:", fechaEl.value);
+        }
+        
+        // Método 3: Estados de React
+        setVoterName(nombres);
+        setVoterApellidos(apellidos);
+        setVoterFechaNacimiento(fecha);
+        
+        alert(`✅ DATOS CARGADOS EXITOSAMENTE\n\nNombre: ${nombres}\nApellidos: ${apellidos}\nFecha: ${fecha}\n\n¿Los ves en los campos?`);
+      } else {
+        alert("❌ No se encontró información del DNI");
+      }
+    } catch (error) {
+      alert("❌ Error al consultar DNI: " + error);
+    } finally {
+      setLoadingDniInfo(false);
+    }
+  };
+  
+  // Autocompletar datos desde Factiliza cuando se ingresa DNI
+  useEffect(() => {
+    const fetchDniData = async () => {
+      // Solo buscar si el DNI tiene exactamente 8 dígitos
+      if (!/^\d{8}$/.test(voterDni)) {
+        return;
+      }
+
+      setLoadingDniInfo(true);
+      setError("");
+      console.log("🔍 Buscando DNI:", voterDni);
+      console.log("🔍 Estado de refs:", {
+        nombreRef: nombreInputRef.current ? "✅ Existe" : "❌ NULL",
+        apellidosRef: apellidosInputRef.current ? "✅ Existe" : "❌ NULL",
+        fechaRef: fechaInputRef.current ? "✅ Existe" : "❌ NULL"
+      });
+      
+      try {
+        // Primero intentar obtener desde la BD local
+        const rec = await getVotanteByDni(voterDni);
+        
+        if (rec) {
+          // Si existe en BD, usar esos datos
+          console.log("✅ Votante encontrado en BD:", rec);
+          setVoterName(rec.nombres || "");
+          setVoterApellidos(rec.apellidos || "");
+          setVoterFechaNacimiento(rec.fecha_nacimiento || "");
+          setVoterRegion(rec.region || "");
+          setVoterDistrito(rec.distrito || "");
+          setLoadingDniInfo(false);
+          return;
+        }
+        
+        // Si no existe en BD, consultar Factiliza
+        console.log("🌐 No encontrado en BD, consultando Factiliza...");
+        const token = localStorage.getItem('sen:factilizaToken') || '';
+        
+        if (!token) {
+          console.warn("⚠️ Token de Factiliza no configurado");
+          setError("Configure el token de Factiliza para autocompletar datos");
+          setLoadingDniInfo(false);
+          return;
+        }
+        
+        const factilizaResponse = await getDniInfoFromFactiliza(voterDni, token);
+        console.log("📡 Respuesta de Factiliza:", factilizaResponse);
+        
+        if (factilizaResponse.success && factilizaResponse.data) {
+          const data: any = factilizaResponse.data;
+          console.log("✅ Datos completos de Factiliza:", JSON.stringify(data, null, 2));
+          
+          // Extraer y formatear datos
+          const nombres = (data.nombres || "").trim();
+          const apellidoPaterno = (data.apellido_paterno || "").trim();
+          const apellidoMaterno = (data.apellido_materno || "").trim();
+          const apellidos = `${apellidoPaterno} ${apellidoMaterno}`.trim();
+          const fechaNacimiento = (data.fecha_nacimiento || "").trim();
+          
+          console.log("📝 Valores a actualizar:", { 
+            nombres, 
+            apellidoPaterno,
+            apellidoMaterno,
+            apellidos, 
+            fechaNacimiento 
+          });
+          
+          // ACTUALIZACIÓN INMEDIATA Y MÚLTIPLE
+          console.log("🔄 INICIANDO ACTUALIZACIÓN INMEDIATA");
+          console.log("📦 Datos a aplicar:", { nombres, apellidos, fechaNacimiento });
+          
+          // 1. Actualizar estados
+          setVoterName(nombres);
+          setVoterApellidos(apellidos);
+          setVoterFechaNacimiento(fechaNacimiento);
+          
+          // 2. Actualizar DOM INMEDIATAMENTE
+          if (nombreInputRef.current) {
+            nombreInputRef.current.value = nombres;
+            console.log("✅ Nombre actualizado INMEDIATAMENTE:", nombreInputRef.current.value);
+          } else {
+            console.error("❌ nombreInputRef.current es null");
+          }
+          
+          if (apellidosInputRef.current) {
+            apellidosInputRef.current.value = apellidos;
+            console.log("✅ Apellidos actualizados INMEDIATAMENTE:", apellidosInputRef.current.value);
+          } else {
+            console.error("❌ apellidosInputRef.current es null");
+          }
+          
+          if (fechaInputRef.current) {
+            fechaInputRef.current.value = fechaNacimiento;
+            console.log("✅ Fecha actualizada INMEDIATAMENTE:", fechaInputRef.current.value);
+          } else {
+            console.error("❌ fechaInputRef.current es null");
+          }
+          
+          // 3. Actualizar de nuevo después de 50ms por si acaso
+          setTimeout(() => {
+            if (nombreInputRef.current) nombreInputRef.current.value = nombres;
+            if (apellidosInputRef.current) apellidosInputRef.current.value = apellidos;
+            if (fechaInputRef.current) fechaInputRef.current.value = fechaNacimiento;
+            console.log("✅ Segunda actualización completada");
+          }, 50);
+          
+          // 4. Actualizar de nuevo después de 200ms
+          setTimeout(() => {
+            if (nombreInputRef.current) nombreInputRef.current.value = nombres;
+            if (apellidosInputRef.current) apellidosInputRef.current.value = apellidos;
+            if (fechaInputRef.current) fechaInputRef.current.value = fechaNacimiento;
+            console.log("✅ Tercera actualización completada");
+          }, 200);
+        } else {
+          console.warn("❌ No se encontró información:", factilizaResponse.message);
+          setError(factilizaResponse.message || "No se encontró información del DNI");
+        }
+      } catch (error) {
+        console.error("❌ Error:", error);
+        setError("Error al consultar información del DNI");
+      } finally {
+        setLoadingDniInfo(false);
+      }
+    };
+
+    fetchDniData();
   }, [voterDni])
 
+  // Cargar token de Factiliza desde localStorage
   useEffect(() => {
     try {
-      const t = localStorage.getItem('sen:voterApiToken') || ''
-      const u = localStorage.getItem('sen:voterApiUrl') || ''
-      setApiToken(t)
-      setApiUrl(u)
+      const token = localStorage.getItem('sen:factilizaToken') || ''
+      setFactilizaToken(token)
     } catch {}
   }, [])
+  
+  // Guardar token de Factiliza
+  const saveFactilizaToken = () => {
+    try {
+      localStorage.setItem('sen:factilizaToken', factilizaToken)
+      setShowTokenConfig(false)
+      alert('Token guardado correctamente')
+    } catch (error) {
+      alert('Error al guardar el token')
+    }
+  }
   
   // Estados para el modal de confirmación
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -427,7 +629,7 @@ export default function VotePage() {
   const [presidentialCandidatesFromDB, setPresidentialCandidatesFromDB] = useState<Candidato[]>([]);
   const [regionalCandidatesFromDB, setRegionalCandidatesFromDB] = useState<Candidato[]>([]);
   const [distritalCandidatesFromDB, setDistritalCandidatesFromDB] = useState<Candidato[]>([]);
-  const [loadingCandidates, setLoadingCandidates] = useState(false);
+  const [, setLoadingCandidates] = useState(false);
   
   // Estados para controlar qué categorías ya fueron votadas
   const [hasVotedPresidencial, setHasVotedPresidencial] = useState(false);
@@ -1278,7 +1480,7 @@ export default function VotePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* DNI */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="dni" className="text-gray-800 font-semibold text-sm">
+                  <Label className="text-gray-800 font-semibold text-sm">
                     Número de DNI *
                   </Label>
                   <div className="relative">
@@ -1290,58 +1492,92 @@ export default function VotePage() {
                       placeholder="12345678"
                       maxLength={8}
                       required
-                      className="pl-10 h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
+                      className="pl-10 pr-10 h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
                     />
+                    {loadingDniInfo && (
+                      <div className="absolute right-3 top-2.5">
+                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
                   </div>
+                  {loadingDniInfo && (
+                    <p className="text-xs text-blue-600">Consultando información del DNI...</p>
+                  )}
+                  {voterDni.length === 8 && !loadingDniInfo && (
+                    <Button
+                      type="button"
+                      onClick={handleManualAutocomplete}
+                      className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white text-xs h-8"
+                    >
+                      🔄 Autocompletar con DNI
+                    </Button>
+                  )}
                 </div>
 
                 {/* Nombres */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="nombre" className="text-gray-800 font-semibold text-sm">
+                  <Label className="text-gray-800 font-semibold text-sm">
                     Nombres *
                   </Label>
-                  <Input
+                  <input
+                    ref={nombreInputRef}
                     id="nombre"
-                    value={voterName}
-                    onChange={(e) => setVoterName(e.target.value)}
+                    name="nombre"
+                    type="text"
+                    onChange={(e) => {
+                      console.log("📝 Cambiando nombre a:", e.target.value);
+                      setVoterName(e.target.value);
+                    }}
                     placeholder="Juan Carlos"
                     required
-                    className="h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
+                    className="h-9 w-full rounded-md bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm px-3"
                   />
+                  {voterName && <p className="text-xs text-green-600">✓ Valor actual: {voterName}</p>}
                 </div>
 
                 {/* Apellidos */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="apellidos" className="text-gray-800 font-semibold text-sm">
+                  <Label className="text-gray-800 font-semibold text-sm">
                     Apellidos Completos *
                   </Label>
-                  <Input
+                  <input
+                    ref={apellidosInputRef}
                     id="apellidos"
-                    value={voterApellidos}
-                    onChange={(e) => setVoterApellidos(e.target.value)}
+                    name="apellidos"
+                    type="text"
+                    onChange={(e) => {
+                      console.log("📝 Cambiando apellidos a:", e.target.value);
+                      setVoterApellidos(e.target.value);
+                    }}
                     placeholder="Pérez García"
                     required
-                    className="h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
+                    className="h-9 w-full rounded-md bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm px-3"
                   />
+                  {voterApellidos && <p className="text-xs text-green-600">✓ Valor actual: {voterApellidos}</p>}
                 </div>
 
                 {/* Fecha de Nacimiento */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="fechaNacimiento" className="text-gray-800 font-semibold text-sm">
+                  <Label className="text-gray-800 font-semibold text-sm">
                     Fecha de Nacimiento *
                   </Label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-                    <Input
+                    <input
+                      ref={fechaInputRef}
                       id="fechaNacimiento"
+                      name="fechaNacimiento"
                       type="date"
-                      value={voterFechaNacimiento}
-                      onChange={(e) => handleFechaNacimientoChange(e.target.value)}
+                      onChange={(e) => {
+                        console.log("📝 Cambiando fecha a:", e.target.value);
+                        handleFechaNacimientoChange(e.target.value);
+                      }}
                       required
                       max={new Date().toISOString().split('T')[0]}
-                      className="pl-10 h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
+                      className="pl-10 h-9 w-full rounded-md bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
                     />
                   </div>
+                  {voterFechaNacimiento && <p className="text-xs text-green-600">✓ Fecha: {voterFechaNacimiento}</p>}
                   {isMinor && (
                     <div className="flex items-center gap-2 text-amber-700 text-xs bg-amber-50 rounded-lg p-2 border border-amber-300">
                       <AlertCircle className="h-4 w-4" />
@@ -1352,7 +1588,7 @@ export default function VotePage() {
 
                 {/* Región */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="region" className="text-gray-800 font-semibold text-sm">
+                  <Label className="text-gray-800 font-semibold text-sm">
                     Región *
                   </Label>
                   <div className="relative">
@@ -1384,7 +1620,7 @@ export default function VotePage() {
 
                 {/* Distrito */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="distrito" className="text-gray-800 font-semibold text-sm">
+                  <Label className="text-gray-800 font-semibold text-sm">
                     Distrito de Residencia *
                   </Label>
                   <Select 
@@ -1434,10 +1670,75 @@ export default function VotePage() {
               <p className="text-gray-600 text-xs">
                 🔒 Sus datos están protegidos 
               </p>
+              <button
+                type="button"
+                onClick={() => setShowTokenConfig(true)}
+                className="text-blue-600 hover:text-blue-700 text-xs mt-2 underline"
+              >
+                Configurar API Factiliza
+              </button>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal de configuración de token Factiliza */}
+      {showTokenConfig && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full mx-auto shadow-2xl">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
+              <h2 className="text-xl font-bold">Configurar API Factiliza</h2>
+              <p className="text-blue-100 text-sm mt-1">
+                Ingrese su token para autocompletar datos del DNI
+              </p>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <Label className="text-gray-700 font-semibold">
+                  Token de API
+                </Label>
+                <Input
+                  id="factilizaToken"
+                  type="password"
+                  value={factilizaToken}
+                  onChange={(e) => setFactilizaToken(e.target.value)}
+                  placeholder="Ingrese su token de Factiliza"
+                  className="mt-2"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Obtén tu token en{' '}
+                  <a 
+                    href="https://factiliza.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    factiliza.com
+                  </a>
+                </p>
+              </div>
+              
+              <div className="flex gap-3 pt-2">
+                <Button
+                  type="button"
+                  onClick={() => setShowTokenConfig(false)}
+                  className="flex-1 bg-gray-500 hover:bg-gray-600"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="button"
+                  onClick={saveFactilizaToken}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  Guardar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

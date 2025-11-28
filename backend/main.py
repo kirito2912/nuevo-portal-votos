@@ -55,7 +55,7 @@ async def root():
     }
 
 # Configuración de conexión a SQL Server
-DB_SERVER = os.getenv("DB_SERVER", "DESKTOP-9HF4IO3\\PC")
+DB_SERVER = os.getenv("DB_SERVER", "electoral-system-2024.database.windows.net")
 DB_DATABASE = os.getenv("DB_DATABASE", "SISTEMA_ELECTORAL")
 DB_USER = os.getenv("DB_USER", "")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
@@ -109,7 +109,9 @@ def _try_db_connection():
                 f"DATABASE={DB_DATABASE};"
                 f"UID={DB_USER};"
                 f"PWD={DB_PASSWORD};"
-                "TrustServerCertificate=yes;"
+                "Encrypt=yes;"
+                "TrustServerCertificate=no;"
+                "Connection Timeout=30;"
             )
     return pyodbc.connect(connection_string)
 
