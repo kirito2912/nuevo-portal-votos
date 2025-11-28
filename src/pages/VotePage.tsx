@@ -390,7 +390,7 @@ export default function VotePage() {
   const apellidosInputRef = useRef<HTMLInputElement>(null);
   const fechaInputRef = useRef<HTMLInputElement>(null);
   
-  // Función manual para autocompletar (botón)
+  // Función manual para autocompletar (botón) - VERSIÓN AGRESIVA
   const handleManualAutocomplete = async () => {
     if (!/^\d{8}$/.test(voterDni)) {
       alert("Por favor ingrese un DNI válido de 8 dígitos");
@@ -403,7 +403,7 @@ export default function VotePage() {
     try {
       const token = localStorage.getItem('sen:factilizaToken') || '';
       if (!token) {
-        setError("Configure el token de Factiliza primero");
+        alert("⚠️ Configure el token de Factiliza primero\n\nHaga clic en 'Configurar API Factiliza' abajo");
         setLoadingDniInfo(false);
         return;
       }
@@ -416,22 +416,54 @@ export default function VotePage() {
         const apellidos = `${(data.apellido_paterno || "").trim()} ${(data.apellido_materno || "").trim()}`.trim();
         const fecha = (data.fecha_nacimiento || "").trim();
         
-        // Actualizar directamente
-        if (nombreInputRef.current) nombreInputRef.current.value = nombres;
-        if (apellidosInputRef.current) apellidosInputRef.current.value = apellidos;
-        if (fechaInputRef.current) fechaInputRef.current.value = fecha;
+        console.log("🎯 ACTUALIZANDO MANUALMENTE:", { nombres, apellidos, fecha });
         
-        // Actualizar estados
+        // Método 1: Refs
+        if (nombreInputRef.current) {
+          nombreInputRef.current.value = nombres;
+          console.log("✅ Ref nombre:", nombreInputRef.current.value);
+        }
+        if (apellidosInputRef.current) {
+          apellidosInputRef.current.value = apellidos;
+          console.log("✅ Ref apellidos:", apellidosInputRef.current.value);
+        }
+        if (fechaInputRef.current) {
+          fechaInputRef.current.value = fecha;
+          console.log("✅ Ref fecha:", fechaInputRef.current.value);
+        }
+        
+        // Método 2: getElementById
+        const nombreEl = document.getElementById('nombre') as HTMLInputElement;
+        const apellidosEl = document.getElementById('apellidos') as HTMLInputElement;
+        const fechaEl = document.getElementById('fechaNacimiento') as HTMLInputElement;
+        
+        if (nombreEl) {
+          nombreEl.value = nombres;
+          nombreEl.setAttribute('value', nombres);
+          console.log("✅ getElementById nombre:", nombreEl.value);
+        }
+        if (apellidosEl) {
+          apellidosEl.value = apellidos;
+          apellidosEl.setAttribute('value', apellidos);
+          console.log("✅ getElementById apellidos:", apellidosEl.value);
+        }
+        if (fechaEl) {
+          fechaEl.value = fecha;
+          fechaEl.setAttribute('value', fecha);
+          console.log("✅ getElementById fecha:", fechaEl.value);
+        }
+        
+        // Método 3: Estados de React
         setVoterName(nombres);
         setVoterApellidos(apellidos);
         setVoterFechaNacimiento(fecha);
         
-        alert(`✅ Datos cargados:\nNombre: ${nombres}\nApellidos: ${apellidos}`);
+        alert(`✅ DATOS CARGADOS EXITOSAMENTE\n\nNombre: ${nombres}\nApellidos: ${apellidos}\nFecha: ${fecha}\n\n¿Los ves en los campos?`);
       } else {
-        setError("No se encontró información del DNI");
+        alert("❌ No se encontró información del DNI");
       }
     } catch (error) {
-      setError("Error al consultar DNI");
+      alert("❌ Error al consultar DNI: " + error);
     } finally {
       setLoadingDniInfo(false);
     }
