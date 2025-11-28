@@ -390,6 +390,53 @@ export default function VotePage() {
   const apellidosInputRef = useRef<HTMLInputElement>(null);
   const fechaInputRef = useRef<HTMLInputElement>(null);
   
+  // Función manual para autocompletar (botón)
+  const handleManualAutocomplete = async () => {
+    if (!/^\d{8}$/.test(voterDni)) {
+      alert("Por favor ingrese un DNI válido de 8 dígitos");
+      return;
+    }
+    
+    setLoadingDniInfo(true);
+    setError("");
+    
+    try {
+      const token = localStorage.getItem('sen:factilizaToken') || '';
+      if (!token) {
+        setError("Configure el token de Factiliza primero");
+        setLoadingDniInfo(false);
+        return;
+      }
+      
+      const response = await getDniInfoFromFactiliza(voterDni, token);
+      
+      if (response.success && response.data) {
+        const data: any = response.data;
+        const nombres = (data.nombres || "").trim();
+        const apellidos = `${(data.apellido_paterno || "").trim()} ${(data.apellido_materno || "").trim()}`.trim();
+        const fecha = (data.fecha_nacimiento || "").trim();
+        
+        // Actualizar directamente
+        if (nombreInputRef.current) nombreInputRef.current.value = nombres;
+        if (apellidosInputRef.current) apellidosInputRef.current.value = apellidos;
+        if (fechaInputRef.current) fechaInputRef.current.value = fecha;
+        
+        // Actualizar estados
+        setVoterName(nombres);
+        setVoterApellidos(apellidos);
+        setVoterFechaNacimiento(fecha);
+        
+        alert(`✅ Datos cargados:\nNombre: ${nombres}\nApellidos: ${apellidos}`);
+      } else {
+        setError("No se encontró información del DNI");
+      }
+    } catch (error) {
+      setError("Error al consultar DNI");
+    } finally {
+      setLoadingDniInfo(false);
+    }
+  };
+  
   // Autocompletar datos desde Factiliza cuando se ingresa DNI
   useEffect(() => {
     const fetchDniData = async () => {
@@ -1423,6 +1470,15 @@ export default function VotePage() {
                   </div>
                   {loadingDniInfo && (
                     <p className="text-xs text-blue-600">Consultando información del DNI...</p>
+                  )}
+                  {voterDni.length === 8 && !loadingDniInfo && (
+                    <Button
+                      type="button"
+                      onClick={handleManualAutocomplete}
+                      className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white text-xs h-8"
+                    >
+                      🔄 Autocompletar con DNI
+                    </Button>
                   )}
                 </div>
 
