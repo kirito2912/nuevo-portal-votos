@@ -53,34 +53,36 @@ async def root():
     }
 
 # Configuración de conexión a SQL Server
-DB_SERVER = os.getenv("DB_SERVER", "DESKTOP-9HF4IO3\\PC")
+DB_SERVER = os.getenv("DB_SERVER", "electoral-system-2024.database.windows.net")
 DB_DATABASE = os.getenv("DB_DATABASE", "SISTEMA_ELECTORAL")
-DB_USER = os.getenv("DB_USER", "")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+DB_USER = os.getenv("DB_USER", "admin_electoral")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "Eduardo123")
 DB_DRIVER = os.getenv("DB_DRIVER", "ODBC Driver 17 for SQL Server")
-DB_TRUSTED_CONNECTION = os.getenv("DB_TRUSTED_CONNECTION", "true").lower() == "true"
+DB_TRUSTED_CONNECTION = os.getenv("DB_TRUSTED_CONNECTION", "false").lower() == "true"
 
 def get_db_connection():
     """Crea una conexión a SQL Server"""
     try:
         if DB_TRUSTED_CONNECTION:
-            # Usar autenticación de Windows (Trusted Connection)
             connection_string = (
                 f"DRIVER={{{DB_DRIVER}}};"
                 f"SERVER={DB_SERVER};"
                 f"DATABASE={DB_DATABASE};"
                 "Trusted_Connection=yes;"
-                "TrustServerCertificate=yes;"
+                "Encrypt=yes;"
+                "TrustServerCertificate=no;"
+                "Connection Timeout=30;"
             )
         else:
-            # Usar autenticación con usuario y contraseña
             connection_string = (
                 f"DRIVER={{{DB_DRIVER}}};"
                 f"SERVER={DB_SERVER};"
                 f"DATABASE={DB_DATABASE};"
                 f"UID={DB_USER};"
                 f"PWD={DB_PASSWORD};"
-                "TrustServerCertificate=yes;"
+                "Encrypt=yes;"
+                "TrustServerCertificate=no;"
+                "Connection Timeout=30;"
             )
         conn = pyodbc.connect(connection_string)
         return conn
