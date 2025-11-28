@@ -429,21 +429,47 @@ export default function VotePage() {
         
         if (factilizaResponse.success && factilizaResponse.data) {
           const data: any = factilizaResponse.data;
-          console.log("✅ Datos de Factiliza:", data);
+          console.log("✅ Datos completos de Factiliza:", JSON.stringify(data, null, 2));
           
-          // Extraer datos
-          const nombres = data.nombres || "";
-          const apellidoPaterno = data.apellido_paterno || "";
-          const apellidoMaterno = data.apellido_materno || "";
+          // Extraer y formatear datos
+          const nombres = (data.nombres || "").trim();
+          const apellidoPaterno = (data.apellido_paterno || "").trim();
+          const apellidoMaterno = (data.apellido_materno || "").trim();
           const apellidos = `${apellidoPaterno} ${apellidoMaterno}`.trim();
-          const fechaNacimiento = data.fecha_nacimiento || "";
+          const fechaNacimiento = (data.fecha_nacimiento || "").trim();
           
-          console.log("📝 Actualizando campos con:", { nombres, apellidos, fechaNacimiento });
+          console.log("📝 Valores a actualizar:", { 
+            nombres, 
+            apellidoPaterno,
+            apellidoMaterno,
+            apellidos, 
+            fechaNacimiento 
+          });
           
-          // Actualizar estados de forma síncrona
-          setVoterName(nombres);
-          setVoterApellidos(apellidos);
-          setVoterFechaNacimiento(fechaNacimiento);
+          // Actualizar estados uno por uno con logs
+          if (nombres) {
+            console.log("🔄 Actualizando nombre:", nombres);
+            setVoterName(nombres);
+          }
+          
+          if (apellidos) {
+            console.log("🔄 Actualizando apellidos:", apellidos);
+            setVoterApellidos(apellidos);
+          }
+          
+          if (fechaNacimiento) {
+            console.log("🔄 Actualizando fecha:", fechaNacimiento);
+            setVoterFechaNacimiento(fechaNacimiento);
+          }
+          
+          // Forzar actualización después de un pequeño delay
+          setTimeout(() => {
+            console.log("🔍 Verificando valores actuales:", {
+              voterName,
+              voterApellidos,
+              voterFechaNacimiento
+            });
+          }, 100);
           
           console.log("✅ Campos actualizados exitosamente");
         } else {
@@ -1376,7 +1402,9 @@ export default function VotePage() {
                     Nombres *
                   </Label>
                   <Input
+                    key={`nombre-${voterDni}`}
                     id="nombre"
+                    type="text"
                     value={voterName}
                     onChange={(e) => {
                       console.log("📝 Cambiando nombre a:", e.target.value);
@@ -1395,7 +1423,9 @@ export default function VotePage() {
                     Apellidos Completos *
                   </Label>
                   <Input
+                    key={`apellidos-${voterDni}`}
                     id="apellidos"
+                    type="text"
                     value={voterApellidos}
                     onChange={(e) => {
                       console.log("📝 Cambiando apellidos a:", e.target.value);
@@ -1416,15 +1446,20 @@ export default function VotePage() {
                   <div className="relative">
                     <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
                     <Input
+                      key={`fecha-${voterDni}`}
                       id="fechaNacimiento"
                       type="date"
                       value={voterFechaNacimiento}
-                      onChange={(e) => handleFechaNacimientoChange(e.target.value)}
+                      onChange={(e) => {
+                        console.log("📝 Cambiando fecha a:", e.target.value);
+                        handleFechaNacimientoChange(e.target.value);
+                      }}
                       required
                       max={new Date().toISOString().split('T')[0]}
                       className="pl-10 h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
                     />
                   </div>
+                  {voterFechaNacimiento && <p className="text-xs text-green-600">✓ Fecha: {voterFechaNacimiento}</p>}
                   {isMinor && (
                     <div className="flex items-center gap-2 text-amber-700 text-xs bg-amber-50 rounded-lg p-2 border border-amber-300">
                       <AlertCircle className="h-4 w-4" />
