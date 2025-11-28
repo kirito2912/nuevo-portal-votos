@@ -100,7 +100,9 @@ export const getDniInfoFromFactiliza = async (dni: string, token?: string): Prom
     }
     
     const data = await response.json();
-    console.log('✅ Datos recibidos:', data);
+    console.log('✅ Datos recibidos (raw):', JSON.stringify(data, null, 2));
+    console.log('✅ Tipo de datos:', typeof data);
+    console.log('✅ Claves disponibles:', Object.keys(data));
     
     return {
       success: true,
