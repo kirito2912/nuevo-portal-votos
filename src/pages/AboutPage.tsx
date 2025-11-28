@@ -53,28 +53,32 @@ function CheckCircleIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen py-8 sm:py-12 px-4" style={{ background: 'linear-gradient(135deg, #0a1628 0%, #1a2332 100%)' }}>
+    <div className="min-h-screen py-8 sm:py-12 px-4 bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-6 sm:mb-8 text-center">
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3">
-            <InfoIcon className="w-8 h-8 sm:w-10 sm:h-10 text-blue-400" />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+            <div className="w-12 h-12 bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 rounded-xl flex items-center justify-center shadow-md">
+              <InfoIcon className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
               Acerca del Sistema
             </h1>
           </div>
-          <p className="text-gray-400 text-base sm:text-lg">
+          <p className="text-gray-600 text-base sm:text-lg">
             Sistema Electoral Digital Transparente y Seguro
           </p>
         </div>
 
         {/* Misión - Card grande */}
-        <div className="mb-4 sm:mb-6 rounded-lg p-4 sm:p-6 md:p-8 border border-gray-700" style={{ background: 'rgba(15, 23, 42, 0.6)' }}>
+        <div className="mb-4 sm:mb-6 rounded-xl p-4 sm:p-6 md:p-8 border-2 border-gray-200 bg-white shadow-lg">
           <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-            <LayoutIcon className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 flex-shrink-0 mt-1" />
+            <div className="w-12 h-12 bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+              <LayoutIcon className="w-6 h-6 text-white" />
+            </div>
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-white">Nuestra Misión</h2>
-              <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
+              <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-900">Nuestra Misión</h2>
+              <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
                 Facilitar el proceso electoral mediante una plataforma digital moderna, segura y accesible para todos los ciudadanos. Nuestro objetivo es garantizar la transparencia, integridad y confidencialidad de cada voto, fortaleciendo así la democracia y la participación ciudadana.
               </p>
             </div>
@@ -84,23 +88,27 @@ export default function AboutPage() {
         {/* Grid de 2 columnas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
           {/* Seguridad Máxima */}
-          <div className="rounded-lg p-4 sm:p-6 md:p-8 border border-gray-700" style={{ background: 'rgba(15, 23, 42, 0.6)' }}>
+          <div className="rounded-xl p-4 sm:p-6 md:p-8 border-2 border-gray-200 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <ShieldIcon className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 flex-shrink-0 mt-1" />
-              <h2 className="text-xl sm:text-2xl font-bold text-white">Seguridad Máxima</h2>
+              <div className="w-12 h-12 bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                <ShieldIcon className="w-6 h-6 text-white" />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Seguridad Máxima</h2>
             </div>
-            <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
               Implementamos encriptación de extremo a extremo y múltiples capas de seguridad para proteger la integridad de cada voto.
             </p>
           </div>
 
           {/* Privacidad Garantizada */}
-          <div className="rounded-lg p-4 sm:p-6 md:p-8 border border-gray-700" style={{ background: 'rgba(15, 23, 42, 0.6)' }}>
+          <div className="rounded-xl p-4 sm:p-6 md:p-8 border-2 border-gray-200 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <FaLock className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 flex-shrink-0 mt-1" />
-              <h2 className="text-xl sm:text-2xl font-bold text-white">Privacidad Garantizada</h2>
+              <div className="w-12 h-12 bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                <FaLock className="w-6 h-6 text-white" />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Privacidad Garantizada</h2>
             </div>
-            <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
               Tu voto es completamente anónimo. Nadie puede rastrear ni identificar tu elección individual.
             </p>
           </div>
@@ -109,23 +117,27 @@ export default function AboutPage() {
         {/* Segunda fila de 2 columnas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* Transparencia Total */}
-          <div className="rounded-lg p-4 sm:p-6 md:p-8 border border-gray-700" style={{ background: 'rgba(15, 23, 42, 0.6)' }}>
+          <div className="rounded-xl p-4 sm:p-6 md:p-8 border-2 border-gray-200 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <ChartIcon className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 flex-shrink-0 mt-1" />
-              <h2 className="text-xl sm:text-2xl font-bold text-white">Transparencia Total</h2>
+              <div className="w-12 h-12 bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                <ChartIcon className="w-6 h-6 text-white" />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Transparencia Total</h2>
             </div>
-            <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
               Resultados en tiempo real disponibles públicamente. Cada voto es verificable sin comprometer el anonimato.
             </p>
           </div>
 
           {/* Fácil de Usar */}
-          <div className="rounded-lg p-4 sm:p-6 md:p-8 border border-gray-700" style={{ background: 'rgba(15, 23, 42, 0.6)' }}>
+          <div className="rounded-xl p-4 sm:p-6 md:p-8 border-2 border-gray-200 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <CheckCircleIcon className="w-6 h-6 sm:w-8 sm:h-8 text-teal-400 flex-shrink-0 mt-1" />
-              <h2 className="text-xl sm:text-2xl font-bold text-white">Fácil de Usar</h2>
+              <div className="w-12 h-12 bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                <CheckCircleIcon className="w-6 h-6 text-white" />
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Fácil de Usar</h2>
             </div>
-            <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
               Interfaz intuitiva y accesible diseñada para que cualquier ciudadano pueda votar sin dificultad.
             </p>
           </div>

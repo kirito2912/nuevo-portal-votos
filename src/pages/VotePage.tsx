@@ -29,19 +29,19 @@ function CandidateDetailsModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-2xl max-w-2xl w-full mx-auto shadow-2xl max-h-[90vh] overflow-y-auto border border-gray-700">
+      <div className="bg-white rounded-2xl max-w-2xl w-full mx-auto shadow-2xl max-h-[90vh] overflow-y-auto border-2 border-gray-200">
         {/* Header */}
-        <div className="bg-gray-900 p-6 relative">
+        <div className="bg-gradient-to-r from-gray-100 to-gray-200 p-6 relative border-b border-gray-300">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-600 text-gray-400 hover:bg-gray-700 hover:text-white transition-colors"
+            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-200 hover:text-gray-900 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
           
           <div className="flex items-start gap-4">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-blue-600">
+              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-red-500">
                 <img 
                   src={candidate.photo} 
                   alt={`Foto de ${candidate.name}`}
@@ -56,61 +56,61 @@ function CandidateDetailsModal({
                   }}
                 />
               </div>
-              <div className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-800 flex items-center justify-center">
+              <div className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
               </div>
             </div>
             
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-white mb-2">{candidate.name}</h2>
-              <Badge className="bg-blue-600 text-white text-base px-3 py-1">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{candidate.name}</h2>
+              <Badge className="bg-gradient-to-r from-red-600 to-rose-600 text-white text-base px-3 py-1">
                 {candidate.party}
               </Badge>
-              <p className="text-gray-300 mt-3 leading-relaxed">{candidate.description}</p>
+              <p className="text-gray-700 mt-3 leading-relaxed">{candidate.description}</p>
             </div>
           </div>
         </div>
 
         {/* Contenido */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 bg-gray-50">
           {/* Educación y Experiencia */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-gray-700 rounded-xl p-4 border border-gray-600">
+            <div className="bg-white rounded-xl p-4 border-2 border-gray-200 shadow-md">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-gray-300 to-gray-400 rounded-lg flex items-center justify-center">
                   <BookOpen className="h-4 w-4 text-white" />
                 </div>
-                <h3 className="font-bold text-white">Formación Académica</h3>
+                <h3 className="font-bold text-gray-900">Formación Académica</h3>
               </div>
-              <p className="text-gray-300 text-sm leading-relaxed">{candidate.education}</p>
+              <p className="text-gray-700 text-sm leading-relaxed">{candidate.education}</p>
             </div>
 
-            <div className="bg-gray-700 rounded-xl p-4 border border-gray-600">
+            <div className="bg-white rounded-xl p-4 border-2 border-gray-200 shadow-md">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-gray-300 to-gray-400 rounded-lg flex items-center justify-center">
                   <Award className="h-4 w-4 text-white" />
                 </div>
-                <h3 className="font-bold text-white">Experiencia Profesional</h3>
+                <h3 className="font-bold text-gray-900">Experiencia Profesional</h3>
               </div>
-              <p className="text-gray-300 text-sm leading-relaxed">{candidate.experience}</p>
+              <p className="text-gray-700 text-sm leading-relaxed">{candidate.experience}</p>
             </div>
           </div>
 
           {/* Propuestas Principales */}
-          <div className="bg-gray-700 rounded-xl p-4 border border-gray-600">
+          <div className="bg-white rounded-xl p-4 border-2 border-gray-200 shadow-md">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-gray-300 to-gray-400 rounded-lg flex items-center justify-center">
                 <Target className="h-4 w-4 text-white" />
               </div>
-              <h3 className="font-bold text-white">Propuestas Principales</h3>
+              <h3 className="font-bold text-gray-900">Propuestas Principales</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {candidate.proposals.map((proposal, index) => (
-                <div key={index} className="flex items-start gap-3 bg-gray-600/50 p-3 rounded-lg">
-                  <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold mt-0.5">
+                <div key={index} className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                  <div className="w-6 h-6 bg-gradient-to-r from-red-600 to-rose-600 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold mt-0.5">
                     {index + 1}
                   </div>
-                  <span className="text-gray-300 text-sm leading-relaxed">{proposal}</span>
+                  <span className="text-gray-700 text-sm leading-relaxed">{proposal}</span>
                 </div>
               ))}
             </div>
@@ -147,46 +147,46 @@ function ConfirmVoteModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-2xl max-w-md w-full mx-auto shadow-2xl border border-gray-700">
+      <div className="bg-white rounded-2xl max-w-md w-full mx-auto shadow-2xl border-2 border-gray-200">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
+        <div className="bg-gradient-to-r from-gray-200 via-gray-300 to-gray-400 p-6 rounded-t-2xl">
           <div className="flex items-center justify-center mb-2">
-            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
-              <Shield className="h-7 w-7 text-white" />
+            <div className="w-14 h-14 bg-white/40 rounded-2xl flex items-center justify-center">
+              <Shield className="h-7 w-7 text-gray-800" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-center">Confirmar Voto</h2>
-          <p className="text-center text-blue-100 mt-2">Verifique su selección antes de confirmar</p>
+          <h2 className="text-2xl font-bold text-center text-gray-900">Confirmar Voto</h2>
+          <p className="text-center text-gray-700 mt-2">Verifique su selección antes de confirmar</p>
         </div>
 
         {/* Contenido */}
         <div className="p-6 space-y-5">
           {/* Datos del Votante */}
-          <div className="bg-gray-700 rounded-xl p-4 border border-gray-600">
+          <div className="bg-gray-50 rounded-xl p-4 border-2 border-gray-200">
             <div className="flex items-center gap-2 mb-3">
-              <User className="h-5 w-5 text-blue-400" />
-              <h3 className="font-semibold text-white">Datos del Votante</h3>
+              <User className="h-5 w-5 text-gray-700" />
+              <h3 className="font-semibold text-gray-900">Datos del Votante</h3>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="font-semibold text-gray-300">DNI:</span>
-                <span className="text-white">{voterData.dni}</span>
+                <span className="font-semibold text-gray-600">DNI:</span>
+                <span className="text-gray-900">{voterData.dni}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-semibold text-gray-300">Nombre:</span>
-                <span className="text-white">{voterData.name}</span>
+                <span className="font-semibold text-gray-600">Nombre:</span>
+                <span className="text-gray-900">{voterData.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="font-semibold text-gray-300">Ubicación:</span>
-                <span className="text-white">{voterData.location}</span>
+                <span className="font-semibold text-gray-600">Ubicación:</span>
+                <span className="text-gray-900">{voterData.location}</span>
               </div>
             </div>
           </div>
 
           {/* Candidato seleccionado */}
-          <div className="border-t border-gray-600 pt-4">
+          <div className="border-t-2 border-gray-200 pt-4">
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-600 flex-shrink-0">
+              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-red-500 flex-shrink-0">
                 <img 
                   src={candidatePhoto} 
                   alt={`Foto de ${candidateName}`}
@@ -202,11 +202,11 @@ function ConfirmVoteModal({
                 />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-xl text-white">{candidateName}</h3>
-                <Badge className="bg-blue-600 text-white text-sm mt-1">
+                <h3 className="font-bold text-xl text-gray-900">{candidateName}</h3>
+                <Badge className="bg-gradient-to-r from-red-600 to-rose-600 text-white text-sm mt-1">
                   {candidateParty}
                 </Badge>
-                <p className="text-gray-300 text-sm mt-3 leading-relaxed">
+                <p className="text-gray-700 text-sm mt-3 leading-relaxed">
                   Su voto será registrado para este candidato.
                 </p>
               </div>
@@ -214,12 +214,12 @@ function ConfirmVoteModal({
           </div>
 
           {/* Alerta de atención */}
-          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
+          <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-4">
             <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-amber-400 mt-0.5 flex-shrink-0" />
+              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-bold text-amber-400">¡Atención!</p>
-                <p className="text-sm text-amber-300 mt-1 leading-relaxed">
+                <p className="text-sm font-bold text-amber-800">¡Atención!</p>
+                <p className="text-sm text-amber-700 mt-1 leading-relaxed">
                   Una vez confirmado, su voto no podrá ser modificado. Esta acción es irreversible.
                 </p>
               </div>
@@ -230,13 +230,13 @@ function ConfirmVoteModal({
           <div className="flex gap-3 pt-2">
             <Button
               onClick={onClose}
-              className="flex-1 bg-gray-600 hover:bg-gray-700 text-white h-12 rounded-xl font-semibold text-base"
+              className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 h-12 rounded-xl font-semibold text-base"
             >
               Cancelar
             </Button>
             <Button
               onClick={onConfirm}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white h-12 rounded-xl font-semibold text-base"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white h-12 rounded-xl font-semibold text-base shadow-lg"
             >
               Confirmar Voto
             </Button>
@@ -263,12 +263,12 @@ function CandidateCard({ id: _id, name, party, description, proposals, photo, ed
 
   return (
     <>
-      <Card className="bg-gray-800 border-gray-700 hover:border-blue-500 transition-all duration-300 hover:shadow-2xl h-full">
+      <Card className="bg-white border-2 border-gray-200 hover:border-red-400 transition-all duration-300 hover:shadow-2xl h-full">
         <CardContent className="p-6 flex flex-col h-full">
           {/* Header del candidato */}
           <div className="flex items-start gap-4 mb-4">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-600">
+              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-red-500">
                 <img 
                   src={photo} 
                   alt={`Foto de ${name}`}
@@ -283,7 +283,7 @@ function CandidateCard({ id: _id, name, party, description, proposals, photo, ed
                   }}
                 />
               </div>
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-800 flex items-center justify-center">
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
                 <div className="w-2 h-2 bg-white rounded-full"></div>
               </div>
             </div>
@@ -291,27 +291,27 @@ function CandidateCard({ id: _id, name, party, description, proposals, photo, ed
             <div className="flex-1">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-white">{name}</h3>
-                  <Badge className="bg-blue-600 text-white mt-1">{party}</Badge>
+                  <h3 className="text-xl font-bold text-gray-900">{name}</h3>
+                  <Badge className="bg-gradient-to-r from-red-600 to-rose-600 text-white mt-1">{party}</Badge>
                 </div>
               </div>
-              <p className="text-gray-300 text-sm mt-2 leading-relaxed">{description}</p>
+              <p className="text-gray-700 text-sm mt-2 leading-relaxed">{description}</p>
             </div>
           </div>
 
           {/* Propuestas destacadas */}
           <div className="mb-4 flex-1">
             <div className="flex items-center gap-2 mb-3">
-              <Target className="h-4 w-4 text-purple-400" />
-              <span className="text-sm font-semibold text-white">Propuestas Destacadas</span>
+              <Target className="h-4 w-4 text-gray-600" />
+              <span className="text-sm font-semibold text-gray-900">Propuestas Destacadas</span>
             </div>
             <div className="space-y-2">
               {proposals.slice(0, 2).map((proposal: string, index: number) => (
                 <div key={index} className="flex items-start gap-2">
-                  <div className="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold mt-0.5">
+                  <div className="w-5 h-5 bg-gradient-to-r from-red-600 to-rose-600 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold mt-0.5">
                     {index + 1}
                   </div>
-                  <span className="text-gray-300 text-sm leading-relaxed">{proposal}</span>
+                  <span className="text-gray-700 text-sm leading-relaxed">{proposal}</span>
                 </div>
               ))}
             </div>
@@ -319,8 +319,8 @@ function CandidateCard({ id: _id, name, party, description, proposals, photo, ed
 
           {/* Educación breve */}
           <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="h-4 w-4 text-blue-400" />
-            <span className="text-gray-400 text-sm truncate">{education.split(' - ')[0]}</span>
+            <BookOpen className="h-4 w-4 text-gray-600" />
+            <span className="text-gray-600 text-sm truncate">{education.split(' - ')[0]}</span>
           </div>
 
           {/* Botones de acción */}
@@ -328,14 +328,14 @@ function CandidateCard({ id: _id, name, party, description, proposals, photo, ed
             <Button
               onClick={() => setShowDetailsModal(true)}
               variant="outline"
-              className="flex-1 bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+              className="flex-1 bg-gray-100 border-2 border-gray-300 text-gray-800 hover:bg-gray-200"
             >
               <BookOpen className="h-4 w-4 mr-2" />
               Detalles
             </Button>
             <Button
               onClick={onVote}
-              className="flex-1 bg-green-600 hover:bg-green-700"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white shadow-lg"
             >
               <Award className="h-4 w-4 mr-2" />
               Votar
@@ -770,26 +770,26 @@ export default function VotePage() {
   // SI está autenticado, mostrar la INTERFAZ MEJORADA de candidatos
   if (isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
         {/* Header */}
-        <div className="bg-gray-900/80 backdrop-blur-sm border-b border-gray-700/50">
+        <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
           <div className="container mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Button
                   onClick={() => setIsAuthenticated(false)}
                   variant="ghost"
-                  className="text-gray-300 hover:text-white hover:bg-gray-800"
+                  className="text-gray-700 hover:text-gray-900 hover:bg-gray-100"
                 >
                   <ArrowLeft className="h-5 w-5 mr-2" />
                   Volver
                 </Button>
                 <div>
-                  <h1 className="text-2xl font-bold text-white">Sistema de Votación</h1>
-                  <p className="text-gray-400">Seleccione su candidato preferido</p>
+                  <h1 className="text-2xl font-bold text-gray-900">Sistema de Votación</h1>
+                  <p className="text-gray-600">Seleccione su candidato preferido</p>
                 </div>
               </div>
-              <Badge variant="secondary" className="bg-green-600 text-white">
+              <Badge variant="secondary" className="bg-green-600 text-white shadow-md">
                 Identidad Verificada ✓
               </Badge>
             </div>
@@ -804,20 +804,22 @@ export default function VotePage() {
                 key={category.id}
                 className={`cursor-pointer transition-all duration-300 ${
                   activeCategory === category.id 
-                    ? 'bg-blue-600 border-blue-500 transform scale-105' 
-                    : 'bg-gray-800 border-gray-700 hover:bg-gray-750'
+                    ? 'bg-gradient-to-r from-red-600 via-red-500 to-rose-600 border-red-500 transform scale-105 shadow-xl' 
+                    : 'bg-white border-2 border-gray-200 hover:border-gray-300 hover:shadow-lg'
                 }`}
                 onClick={() => setActiveCategory(category.id)}
               >
                 <CardContent className="p-6 text-center">
                   <category.icon className={`h-8 w-8 mx-auto mb-3 ${
-                    activeCategory === category.id ? 'text-white' : 'text-blue-400'
+                    activeCategory === category.id ? 'text-white' : 'text-gray-600'
                   }`} />
-                  <h3 className="font-semibold text-lg text-white">
+                  <h3 className={`font-semibold text-lg ${
+                    activeCategory === category.id ? 'text-white' : 'text-gray-900'
+                  }`}>
                     {category.name}
                   </h3>
                   <p className={`text-sm ${
-                    activeCategory === category.id ? 'text-blue-100' : 'text-gray-400'
+                    activeCategory === category.id ? 'text-red-100' : 'text-gray-600'
                   }`}>
                     {getCandidatesByCategory().length} candidatos
                   </p>
@@ -845,14 +847,14 @@ export default function VotePage() {
           </div>
 
           {/* Información de seguridad */}
-          <Card className="mt-8 bg-gray-800 border-gray-700">
+          <Card className="mt-8 bg-white border-2 border-gray-200 shadow-lg">
             <CardContent className="p-6">
               <div className="text-center">
                 <div className="flex items-center justify-center gap-3 mb-3">
-                  <Shield className="h-6 w-6 text-green-400" />
-                  <h3 className="text-lg font-semibold text-white">Votación Segura</h3>
+                  <Shield className="h-6 w-6 text-green-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">Votación Segura</h3>
                 </div>
-                <p className="text-gray-400">
+                <p className="text-gray-700">
                   Su voto es anónimo y está protegido con cifrado de grado militar. 
                   Una vez confirmado, no podrá ser modificado.
                 </p>
@@ -879,7 +881,7 @@ export default function VotePage() {
         {/* Toast de éxito */}
         {showSuccessToast && (
           <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5">
-            <div className="bg-gray-900 text-white rounded-lg shadow-2xl px-6 py-4 flex items-center gap-3 border border-gray-700">
+            <div className="bg-white text-gray-900 rounded-lg shadow-2xl px-6 py-4 flex items-center gap-3 border-2 border-gray-200">
               <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -895,81 +897,81 @@ export default function VotePage() {
 
   // Vista de verificación previa (formulario original)
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-3">
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-6 items-center h-full max-h-[95vh]">
         
         {/* Lado Izquierdo - Branding */}
-        <div className="text-center lg:text-left space-y-8">
-          <div className="space-y-6">
-            <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-2xl mx-auto lg:mx-0">
-              <Shield className="h-12 w-12 text-white" />
+        <div className="hidden lg:flex flex-col justify-center text-left space-y-6">
+          <div className="space-y-4">
+            <div className="w-20 h-20 bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 rounded-2xl flex items-center justify-center shadow-xl">
+              <Shield className="h-10 w-10 text-white" />
             </div>
-            <h1 className="text-5xl lg:text-6xl font-bold text-white leading-tight">
+            <h1 className="text-4xl xl:text-5xl font-bold text-gray-900 leading-tight">
               Sistema Electoral
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-purple-200 mt-4">
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-gray-600 to-gray-800 mt-2">
                 Nacional
               </span>
             </h1>
-            <p className="text-2xl text-blue-200 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-lg text-gray-700 max-w-lg leading-relaxed">
               Plataforma segura y verificada para ejercer su derecho al voto
             </p>
           </div>
 
-          <div className="hidden lg:block space-y-6">
-            <div className="flex items-center gap-4 text-blue-200 text-lg">
-              <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                <Shield className="h-5 w-5 text-blue-400" />
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 text-gray-700">
+              <div className="w-9 h-9 bg-gray-200 rounded-lg flex items-center justify-center">
+                <Shield className="h-5 w-5 text-gray-600" />
               </div>
-              <span>Verificación de identidad segura</span>
+              <span className="text-sm">Verificación de identidad segura</span>
             </div>
-            <div className="flex items-center gap-4 text-blue-200 text-lg">
-              <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                <Lock className="h-5 w-5 text-blue-400" />
+            <div className="flex items-center gap-3 text-gray-700">
+              <div className="w-9 h-9 bg-gray-200 rounded-lg flex items-center justify-center">
+                <Lock className="h-5 w-5 text-gray-600" />
               </div>
-              <span>Encriptación de extremo a extremo</span>
+              <span className="text-sm">Encriptación de extremo a extremo</span>
             </div>
-            <div className="flex items-center gap-4 text-blue-200 text-lg">
-              <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                <User className="h-5 w-5 text-blue-400" />
+            <div className="flex items-center gap-3 text-gray-700">
+              <div className="w-9 h-9 bg-gray-200 rounded-lg flex items-center justify-center">
+                <User className="h-5 w-5 text-gray-600" />
               </div>
-              <span>Protección de datos personales</span>
+              <span className="text-sm">Protección de datos personales</span>
             </div>
           </div>
         </div>
 
         {/* Lado Derecho - Formulario */}
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-2xl">
-          <CardHeader className="text-center space-y-6 pb-8">
-            <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
-              <Lock className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+        <Card className="bg-white border-2 border-gray-200 shadow-2xl max-h-[95vh] overflow-y-auto">
+          <CardHeader className="text-center space-y-3 pb-4">
+            <div className="mx-auto w-14 h-14 bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 rounded-xl flex items-center justify-center shadow-lg">
+              <Lock className="h-7 w-7 text-white" />
             </div>
             <div>
-              <CardTitle className="text-2xl sm:text-3xl text-white mb-3 sm:mb-4">Verificación de Identidad</CardTitle>
-              <CardDescription className="text-blue-200 text-base sm:text-lg">
+              <CardTitle className="text-xl sm:text-2xl text-gray-900 mb-2">Verificación de Identidad</CardTitle>
+              <CardDescription className="text-gray-600 text-sm">
                 Ingrese sus datos oficiales para acceder al sistema
               </CardDescription>
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-8">
+          <CardContent className="space-y-4">
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
-                <div className="flex items-center gap-3 text-red-300">
-                  <AlertCircle className="h-5 w-5" />
-                  <span className="text-sm">{error}</span>
+              <div className="bg-red-50 border-2 border-red-300 rounded-lg p-3">
+                <div className="flex items-center gap-2 text-red-700">
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="text-xs">{error}</span>
                 </div>
               </div>
             )}
 
-            <form onSubmit={handleAccessSubmit} className="space-y-6 sm:space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <form onSubmit={handleAccessSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* DNI */}
-                <div className="space-y-4">
-                  <Label htmlFor="dni" className="text-white font-semibold text-base">
+                <div className="space-y-1.5">
+                  <Label htmlFor="dni" className="text-gray-800 font-semibold text-sm">
                     Número de DNI *
                   </Label>
                   <div className="relative">
-                    <User className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+                    <User className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
                     <Input
                       id="dni"
                       value={voterDni}
@@ -977,14 +979,14 @@ export default function VotePage() {
                       placeholder="12345678"
                       maxLength={8}
                       required
-                      className="pl-12 h-12 bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-blue-400 text-base"
+                      className="pl-10 h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Nombres */}
-                <div className="space-y-4">
-                  <Label htmlFor="nombre" className="text-white font-semibold text-base">
+                <div className="space-y-1.5">
+                  <Label htmlFor="nombre" className="text-gray-800 font-semibold text-sm">
                     Nombres *
                   </Label>
                   <Input
@@ -993,13 +995,13 @@ export default function VotePage() {
                     onChange={(e) => setVoterName(e.target.value)}
                     placeholder="Juan Carlos"
                     required
-                    className="h-12 bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-blue-400 text-base"
+                    className="h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
                   />
                 </div>
 
                 {/* Apellidos */}
-                <div className="space-y-4">
-                  <Label htmlFor="apellidos" className="text-white font-semibold text-base">
+                <div className="space-y-1.5">
+                  <Label htmlFor="apellidos" className="text-gray-800 font-semibold text-sm">
                     Apellidos Completos *
                   </Label>
                   <Input
@@ -1008,17 +1010,17 @@ export default function VotePage() {
                     onChange={(e) => setVoterApellidos(e.target.value)}
                     placeholder="Pérez García"
                     required
-                    className="h-12 bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-blue-400 text-base"
+                    className="h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
                   />
                 </div>
 
                 {/* Fecha de Nacimiento */}
-                <div className="space-y-4">
-                  <Label htmlFor="fechaNacimiento" className="text-white font-semibold text-base">
+                <div className="space-y-1.5">
+                  <Label htmlFor="fechaNacimiento" className="text-gray-800 font-semibold text-sm">
                     Fecha de Nacimiento *
                   </Label>
                   <div className="relative">
-                    <Calendar className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+                    <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
                     <Input
                       id="fechaNacimiento"
                       type="date"
@@ -1026,24 +1028,24 @@ export default function VotePage() {
                       onChange={(e) => handleFechaNacimientoChange(e.target.value)}
                       required
                       max={new Date().toISOString().split('T')[0]}
-                      className="pl-12 h-12 bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-blue-400"
+                      className="pl-10 h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 placeholder:text-gray-500 focus:border-red-500 text-sm"
                     />
                   </div>
                   {isMinor && (
-                    <div className="flex items-center gap-3 text-amber-300 text-sm bg-amber-500/10 rounded-lg p-3 border border-amber-500/20">
-                      <AlertCircle className="h-5 w-5" />
+                    <div className="flex items-center gap-2 text-amber-700 text-xs bg-amber-50 rounded-lg p-2 border border-amber-300">
+                      <AlertCircle className="h-4 w-4" />
                       <span>Debe ser mayor de 18 años para votar</span>
                     </div>
                   )}
                 </div>
 
                 {/* Región */}
-                <div className="space-y-4">
-                  <Label htmlFor="region" className="text-white font-semibold text-base">
+                <div className="space-y-1.5">
+                  <Label htmlFor="region" className="text-gray-800 font-semibold text-sm">
                     Región *
                   </Label>
                   <div className="relative">
-                    <MapPin className="absolute left-4 top-3.5 h-5 w-5 text-gray-400 z-10" />
+                    <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-500 z-10" />
                     <Select 
                       value={voterRegion} 
                       onValueChange={(value) => {
@@ -1051,15 +1053,15 @@ export default function VotePage() {
                         setVoterDistrito("");
                       }}
                     >
-                      <SelectTrigger className="pl-12 h-12 bg-white/5 border-white/20 text-white focus:border-blue-400">
+                      <SelectTrigger className="pl-10 h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 focus:border-red-500 text-sm">
                         <SelectValue placeholder="Seleccione su región" />
                       </SelectTrigger>
-                      <SelectContent className="bg-gray-800 border-white/20 text-white">
+                      <SelectContent className="bg-white border-gray-200 text-gray-900">
                         {regions.map((region) => (
                           <SelectItem 
                             key={region} 
                             value={region}
-                            className="focus:bg-blue-500 text-base"
+                            className="focus:bg-red-100 text-sm"
                           >
                             {region}
                           </SelectItem>
@@ -1070,8 +1072,8 @@ export default function VotePage() {
                 </div>
 
                 {/* Distrito */}
-                <div className="space-y-4">
-                  <Label htmlFor="distrito" className="text-white font-semibold text-base">
+                <div className="space-y-1.5">
+                  <Label htmlFor="distrito" className="text-gray-800 font-semibold text-sm">
                     Distrito de Residencia *
                   </Label>
                   <Select 
@@ -1079,15 +1081,15 @@ export default function VotePage() {
                     onValueChange={setVoterDistrito}
                     disabled={!voterRegion}
                   >
-                    <SelectTrigger className="h-12 bg-white/5 border-white/20 text-white focus:border-blue-400">
+                    <SelectTrigger className="h-9 bg-gray-50 border-2 border-gray-300 text-gray-900 focus:border-red-500 text-sm">
                       <SelectValue placeholder={voterRegion ? "Seleccione su distrito" : "Primero seleccione región"} />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-white/20 text-white">
+                    <SelectContent className="bg-white border-gray-200 text-gray-900">
                       {voterRegion && distritosByRegion[voterRegion]?.map((distrito) => (
                         <SelectItem 
                           key={distrito} 
                           value={distrito}
-                          className="focus:bg-blue-500 text-base"
+                          className="focus:bg-red-100 text-sm"
                         >
                           {distrito}
                         </SelectItem>
@@ -1100,25 +1102,25 @@ export default function VotePage() {
               {/* Botón enviar */}
               <Button 
                 type="submit" 
-                className="w-full h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg font-semibold rounded-xl shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                className="w-full h-11 bg-gradient-to-r from-red-600 via-red-500 to-rose-600 hover:from-red-700 hover:via-red-600 hover:to-rose-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-red-500/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isSubmitting || isMinor}
               >
                 {isSubmitting ? (
                   <>
-                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mr-3" />
-                    Verificando Identidad...
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                    Verificando...
                   </>
                 ) : isMinor ? (
-                  "Acceso Restringido - Menor de Edad"
+                  "Acceso Restringido"
                 ) : (
-                  "Verificar Identidad y Acceder"
+                  "Verificar y Acceder"
                 )}
               </Button>
             </form>
 
             {/* Pie */}
-            <div className="text-center pt-6 border-t border-white/10">
-              <p className="text-blue-300 text-base">
+            <div className="text-center pt-3 border-t border-gray-200">
+              <p className="text-gray-600 text-xs">
                 🔒 Sus datos están protegidos 
               </p>
             </div>
