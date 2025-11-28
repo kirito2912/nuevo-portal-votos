@@ -1,0 +1,11 @@
+backend/
+node_modules/
+.git/
+.vscode/
+*.log
+*.bat
+*.sh
+__pycache__/
+*.pyc
+.env
+config.env
